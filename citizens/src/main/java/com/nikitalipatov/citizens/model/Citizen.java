@@ -30,6 +30,7 @@ public class Citizen {
 
     private String fullName;
 
+
     private int age;
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
