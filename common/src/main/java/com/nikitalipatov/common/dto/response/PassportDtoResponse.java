@@ -1,4 +1,4 @@
-package com.nikitalipatov.common.dto;
+package com.nikitalipatov.common.dto.response;
 
 import lombok.*;
 
@@ -7,7 +7,7 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class PassportDto {
+public class PassportDtoResponse {
 
     private int number;
     private int serial;

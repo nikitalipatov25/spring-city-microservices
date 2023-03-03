@@ -1,24 +1,24 @@
 package com.nikitalipatov.houses.service;
 
-import com.nikitalipatov.common.dto.HouseDto;
-import com.nikitalipatov.common.dto.HouseRecord;
+import com.nikitalipatov.common.dto.response.HouseDtoResponse;
+import com.nikitalipatov.common.dto.request.HouseDtoRequest;
 import com.nikitalipatov.houses.model.House;
 
 import java.util.List;
 
 public interface HouseService {
 
-    List<HouseDto> getAll();
+    List<HouseDtoResponse> getAll();
 
-    HouseDto create(HouseRecord houseRecord);
+    HouseDtoResponse create(HouseDtoRequest houseDtoRequest);
 
     void delete(int houseId);
 
-    HouseDto edit(int houseId, HouseRecord houseRecord);
+    HouseDtoResponse edit(int houseId, HouseDtoRequest houseDtoRequest);
 
     House getHouse(int houseId);
 
     void removePerson(int personId);
 
-    HouseDto addCitizen(int houseId, int personId);
+    HouseDtoResponse addCitizen(int houseId, int personId);
 }

@@ -1,7 +1,7 @@
 package com.nikitalipatov.houses.service.impl;
 
-import com.nikitalipatov.common.dto.HouseDto;
-import com.nikitalipatov.common.dto.HouseRecord;
+import com.nikitalipatov.common.dto.response.HouseDtoResponse;
+import com.nikitalipatov.common.dto.request.HouseDtoRequest;
 import com.nikitalipatov.common.error.ResourceNotFoundException;
 import com.nikitalipatov.houses.converter.HouseConverter;
 import com.nikitalipatov.houses.model.House;
@@ -24,17 +24,17 @@ public class HouseServiceImpl implements HouseService {
     private final HousePersonRepository housePersonRepository;
 
     @Override
-    public List<HouseDto> getAll() {
+    public List<HouseDtoResponse> getAll() {
         return houseConverter.toDto(houseRepository.findAll());
     }
 
     @Override
     @Transactional
-    public HouseDto create(HouseRecord houseRecord) {
-        return houseConverter.toDto(houseRepository.save(houseConverter.toEntity(houseRecord)));
+    public HouseDtoResponse create(HouseDtoRequest houseDtoRequest) {
+        return houseConverter.toDto(houseRepository.save(houseConverter.toEntity(houseDtoRequest)));
     }
 
-    public HouseDto addCitizen(int houseId, int personId) {
+    public HouseDtoResponse addCitizen(int houseId, int personId) {
         var house = getHouse(houseId);
         List<HousePerson> housePeople = house.getHousePerson();
         housePeople.add(housePersonRepository.save(houseConverter.toEntity(houseId, personId)));
@@ -54,9 +54,9 @@ public class HouseServiceImpl implements HouseService {
 
     @Override
     @Transactional
-    public HouseDto edit(int houseId, HouseRecord houseRecord) {
+    public HouseDtoResponse edit(int houseId, HouseDtoRequest houseDtoRequest) {
         var house = getHouse(houseId);
-        return houseConverter.toDto(houseRepository.save(houseConverter.toEntityEdit(house, houseRecord)));
+        return houseConverter.toDto(houseRepository.save(houseConverter.toEntityEdit(house, houseDtoRequest)));
     }
 
     @Override

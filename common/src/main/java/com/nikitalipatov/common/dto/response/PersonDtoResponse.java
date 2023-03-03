@@ -1,4 +1,4 @@
-package com.nikitalipatov.common.dto;
+package com.nikitalipatov.common.dto.response;
 
 import lombok.*;
 
@@ -9,13 +9,10 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class PersonDto {
+public class PersonDtoResponse {
     private String name;
     private int age;
     private String sex;
     private int passportSerial;
     private int passportNumber;
-//    private List<CarDto> car;
-//    private List<HouseDto> house;
-    //private List<BankDto> bank;
 }

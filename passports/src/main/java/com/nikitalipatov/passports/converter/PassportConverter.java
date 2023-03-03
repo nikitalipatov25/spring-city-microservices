@@ -1,19 +1,30 @@
 package com.nikitalipatov.passports.converter;
 
-import com.nikitalipatov.common.dto.PassportDto;
+import com.nikitalipatov.common.dto.response.PassportDtoResponse;
 import com.nikitalipatov.passports.model.Passport;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
 public class PassportConverter {
 
-    public PassportDto toDto(Passport passport) {
-        return PassportDto.builder()
+    public PassportDtoResponse toDto(Passport passport) {
+        return PassportDtoResponse.builder()
                 .number(passport.getNumber())
                 .serial(passport.getSerial())
                 .build();
+    }
+
+    public List<PassportDtoResponse> toDto(List<Passport> passports) {
+        List<PassportDtoResponse> passportDtoResponses = new ArrayList<>();
+        for (Passport passport : passports) {
+            passportDtoResponses.add(toDto(passport));
+        }
+        return passportDtoResponses;
     }
 
     public Passport toEntity(int personId) {

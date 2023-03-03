@@ -4,8 +4,8 @@ import com.nikitalipatov.cars.model.Car;
 import com.nikitalipatov.cars.repository.CarRepository;
 import com.nikitalipatov.cars.service.CarService;
 import com.nikitalipatov.cars.converter.CarConverter;
-import com.nikitalipatov.common.dto.CarDto;
-import com.nikitalipatov.common.dto.CarRecord;
+import com.nikitalipatov.common.dto.response.CarDtoResponse;
+import com.nikitalipatov.common.dto.request.CarDtoRequest;
 import com.nikitalipatov.common.error.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,33 +21,23 @@ public class CarServiceImpl implements CarService {
     private final CarConverter carConverter;
 
     @Override
-    public List<CarDto> getAll() {
+    public List<CarDtoResponse> getAll() {
         return carConverter.toDto(carRepository.findAll());
     }
 
     @Override
     @Transactional
-    public CarDto create(int personId, CarRecord carRecord) {
-        return carConverter.toDto(carRepository.save(carConverter.toEntity(carRecord, personId)));
+    public CarDtoResponse create(int personId, CarDtoRequest carDtoRequest) {
+        return carConverter.toDto(carRepository.save(carConverter.toEntity(carDtoRequest, personId)));
     }
 
-    public List<CarDto> getCitizenCar(int personId) {
+    public List<CarDtoResponse> getCitizenCar(int personId) {
         return carConverter.toDto(carRepository.findAllByOwnerId(personId));
     }
 
     public void deletePersonCars(int personId) {
         carRepository.deleteAllByOwnerId(personId);
     }
-
-//    @Override
-//    @Transactional
-//    public List<Integer> create(List<CarRecord> carRecords) {
-//        var cars = carConverter.toEntity(carRecords);
-//        carRepository.saveAll(cars);
-//        return cars.stream()
-//                .map((Car::getId))
-//                .toList();
-//    }
 
     @Override
     @Transactional
@@ -57,9 +47,9 @@ public class CarServiceImpl implements CarService {
 
     @Override
     @Transactional
-    public CarDto editCar(int carId, CarRecord carRecord) {
+    public CarDtoResponse editCar(int carId, CarDtoRequest carDtoRequest) {
         Car car = getCar(carId);
-        return carConverter.toDto(carRepository.save(carConverter.toEntity(car, carRecord)));
+        return carConverter.toDto(carRepository.save(carConverter.toEntity(car, carDtoRequest)));
     }
 
     @Override

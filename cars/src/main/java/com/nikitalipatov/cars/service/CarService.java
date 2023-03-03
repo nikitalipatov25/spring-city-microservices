@@ -1,26 +1,24 @@
 package com.nikitalipatov.cars.service;
 
 import com.nikitalipatov.cars.model.Car;
-import com.nikitalipatov.common.dto.CarDto;
-import com.nikitalipatov.common.dto.CarRecord;
+import com.nikitalipatov.common.dto.response.CarDtoResponse;
+import com.nikitalipatov.common.dto.request.CarDtoRequest;
 
 import java.util.List;
 
 public interface CarService {
 
-    List<CarDto> getAll();
+    List<CarDtoResponse> getAll();
 
-    CarDto create(int personId, CarRecord carRecord);
-
-//    List<Integer> create(List<CarRecord> carRecord);
+    CarDtoResponse create(int personId, CarDtoRequest carDtoRequest);
 
     void deleteCar(int carId);
 
-    CarDto editCar(int carId, CarRecord carRecord);
+    CarDtoResponse editCar(int carId, CarDtoRequest carDtoRequest);
 
     Car getCar(int carId);
 
-    List<CarDto> getCitizenCar(int personId);
+    List<CarDtoResponse> getCitizenCar(int personId);
 
     void deletePersonCars(int personId);
 }

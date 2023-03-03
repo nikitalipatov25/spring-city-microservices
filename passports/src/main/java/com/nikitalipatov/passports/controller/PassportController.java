@@ -1,10 +1,12 @@
 package com.nikitalipatov.passports.controller;
 
-import com.nikitalipatov.common.dto.PassportDto;
+import com.nikitalipatov.common.dto.response.PassportDtoResponse;
 import com.nikitalipatov.passports.service.PassportService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping(value = "/api/passport")
@@ -15,13 +17,19 @@ public class PassportController {
 
     @PostMapping(value = "/create")
     @ResponseStatus(value = HttpStatus.ACCEPTED)
-    public PassportDto create(@RequestBody int personId) {
+    public PassportDtoResponse create(@RequestBody int personId) {
         return passportService.create(personId);
+    }
+
+    @GetMapping(value = "/get")
+    @ResponseStatus(value = HttpStatus.ACCEPTED)
+    public List<PassportDtoResponse> getPassportsByOwnerIds(@RequestBody List<Integer> ownersId) {
+        return passportService.getAllByOwnerIds(ownersId);
     }
 
     @GetMapping(value = "/get/{personId}")
     @ResponseStatus(value = HttpStatus.ACCEPTED)
-    public PassportDto getByOwnerId(@PathVariable int personId) {
+    public PassportDtoResponse getByOwnerId(@PathVariable int personId) {
         return passportService.getByOwnerId(personId);
     }
 

@@ -1,4 +1,4 @@
-package com.nikitalipatov.common.dto;
+package com.nikitalipatov.common.dto.response;
 
 import lombok.*;
 
@@ -9,7 +9,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class HouseDto {
+public class HouseDtoResponse {
 
     private String city;
     private String street;

@@ -1,7 +1,9 @@
 package com.nikitalipatov.citizens.converter;
 
 import com.nikitalipatov.citizens.model.Citizen;
-import com.nikitalipatov.common.dto.*;
+import com.nikitalipatov.common.dto.request.PersonDtoRequest;
+import com.nikitalipatov.common.dto.response.PassportDtoResponse;
+import com.nikitalipatov.common.dto.response.PersonDtoResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -12,114 +14,45 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PersonConverter {
 
-   // private final CarConverter carConverter;
-   // private final HouseConverter houseConverter;
-//    private final BankConverter bankConverter;
-
-    public PersonDto toDto(Citizen person, PassportDto passportDto) {
-        return PersonDto.builder()
+    public PersonDtoResponse toDto(Citizen person, PassportDtoResponse passportDtoResponse) {
+        return PersonDtoResponse.builder()
                 .name(person.getFullName())
                 .sex(person.getSex())
                 .age(person.getAge())
-                .passportNumber(passportDto.getNumber())
-                .passportSerial(passportDto.getSerial())
+                .passportNumber(passportDtoResponse.getNumber())
+                .passportSerial(passportDtoResponse.getSerial())
                 .build();
     }
 
-    public PersonDto toDto(Citizen person) {
-        return PersonDto.builder()
+    public PersonDtoResponse toDto(Citizen person) {
+        return PersonDtoResponse.builder()
                 .name(person.getFullName())
                 .sex(person.getSex())
                 .age(person.getAge())
                 .build();
     }
 
-    public List<PersonDto> toDto(List<Citizen> personList) {
-        var persons = new ArrayList<PersonDto>();
+    public List<PersonDtoResponse> toDto(List<Citizen> personList) {
+        var persons = new ArrayList<PersonDtoResponse>();
         for (Citizen citizen : personList) {
             persons.add(toDto(citizen));
         }
         return persons;
     }
 
-//    public PersonPassportDto toPersonPassportDto(Citizen person, PassportDto passportDto) {
-//        return PersonPassportDto.builder()
-//                .name(person.getFullName())
-//                .age(person.getAge())
-//                .sex(person.getSex())
-//                .passportNumber(person.getPassport().getNumber())
-//                .passportSerial(person.getPassport().getSerial())
-//                .sex(person.getPassport().getSex())
-//                .age(person.getAge())
-//                .build();
-//    }
-
-//    public List<PersonPassportDto> toPersonPassportDto(List<Citizen> personList) {
-//        var persons = new ArrayList<PersonPassportDto>();
-//        for (Citizen person : personList) {
-//            persons.add(toPersonPassportDto(person));
-//        }
-//        return persons;
-//    }
-//
-//    public PersonHouseDto toPersonHouseDto(Citizen person, String street) {
-//        return PersonHouseDto.builder()
-//                .name(person.getFullName())
-//                .houses(houseConverter.toDto(person.getHouse().stream().filter(h -> h.getStreet().equals(street)).toList()))
-//                .build();
-//    }
-//
-//    public List<PersonHouseDto> toPersonHouseDto(List<Citizen> personList, String street) {
-//        var persons = new ArrayList<PersonHouseDto>();
-//        for (Citizen person : personList) {
-//            persons.add(toPersonHouseDto(person, street));
-//        }
-//        return persons;
-//    }
-//
-//    public PersonHouseDto toPersonHouseDto(Citizen person) {
-//        return PersonHouseDto.builder()
-//                .name(person.getFullName())
-//                .houses(houseConverter.toDto(person.getHouse().stream().toList()))
-//                .build();
-//    }
-//
-//    public List<PersonHouseDto> toPersonHouseDto(List<Citizen> personList) {
-//        var persons = new ArrayList<PersonHouseDto>();
-//        for (Citizen person : personList) {
-//            persons.add(toPersonHouseDto(person));
-//        }
-//        return persons;
-//    }
-//
-//    public PersonCarDto toPersonCarDto(Citizen person) {
-//        return PersonCarDto.builder()
-//                .name(person.getFullName())
-//                .carList(carConverter.toDto(person.getCar().stream().toList()))
-//                .build();
-//    }
-//
-//    public List<PersonCarDto> toPersonCarDto(List<Citizen> personList) {
-//        var persons = new ArrayList<PersonCarDto>();
-//        for (Citizen person : personList) {
-//            persons.add(toPersonCarDto(person));
-//        }
-//        return persons;
-//    }
-
-    public Citizen toEntity(PersonRecord personRecord) {
+    public Citizen toEntity(PersonDtoRequest personDtoRequest) {
         return Citizen.builder()
-                .sex(personRecord.sex())
-                .age(personRecord.age())
-                .fullName(personRecord.fullName())
+                .sex(personDtoRequest.getSex())
+                .age(personDtoRequest.getAge())
+                .fullName(personDtoRequest.getFullName())
                 .build();
     }
 
-    public Citizen toEntityEdit(Citizen person, PersonRecord personRecord) {
+    public Citizen toEntityEdit(Citizen person, PersonDtoRequest personDtoRequest) {
         return person.toBuilder()
-                .sex(personRecord.sex())
-                .age(personRecord.age())
-                .fullName(personRecord.fullName())
+                .sex(personDtoRequest.getSex())
+                .age(personDtoRequest.getAge())
+                .fullName(personDtoRequest.getFullName())
                 .build();
     }
 

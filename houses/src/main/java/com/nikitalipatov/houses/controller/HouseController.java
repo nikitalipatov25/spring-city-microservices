@@ -1,7 +1,7 @@
 package com.nikitalipatov.houses.controller;
 
-import com.nikitalipatov.common.dto.HouseDto;
-import com.nikitalipatov.common.dto.HouseRecord;
+import com.nikitalipatov.common.dto.response.HouseDtoResponse;
+import com.nikitalipatov.common.dto.request.HouseDtoRequest;
 import com.nikitalipatov.houses.service.HouseService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -18,13 +18,13 @@ public class HouseController {
 
     @GetMapping(value = "/list")
     @ResponseStatus(value = HttpStatus.ACCEPTED)
-    public List<HouseDto> getAll() {
+    public List<HouseDtoResponse> getAll() {
         return houseService.getAll();
     }
 
     @PutMapping(value = "{houseId}/{personId}")
     @ResponseStatus(value = HttpStatus.ACCEPTED)
-    public HouseDto addCitizen(@PathVariable int houseId, @PathVariable int personId) {
+    public HouseDtoResponse addCitizen(@PathVariable int houseId, @PathVariable int personId) {
         return houseService.addCitizen(houseId, personId);
     }
 
@@ -36,8 +36,8 @@ public class HouseController {
 
     @PostMapping(value = "/create")
     @ResponseStatus(value = HttpStatus.ACCEPTED)
-    public HouseDto create(@RequestBody HouseRecord houseRecord) {
-        return houseService.create(houseRecord);
+    public HouseDtoResponse create(@RequestBody HouseDtoRequest houseDtoRequest) {
+        return houseService.create(houseDtoRequest);
     }
 
     @DeleteMapping(value = "/delete/{id}")
@@ -48,7 +48,7 @@ public class HouseController {
 
     @PutMapping(value = "/edit/{id}")
     @ResponseStatus(value = HttpStatus.ACCEPTED)
-    public HouseDto edit(@PathVariable int id, @RequestBody HouseRecord houseRecord) {
-        return houseService.edit(id, houseRecord);
+    public HouseDtoResponse edit(@PathVariable int id, @RequestBody HouseDtoRequest houseDtoRequest) {
+        return houseService.edit(id, houseDtoRequest);
     }
 }

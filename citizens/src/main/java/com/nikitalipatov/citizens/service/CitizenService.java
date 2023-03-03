@@ -1,29 +1,22 @@
 package com.nikitalipatov.citizens.service;
 
 import com.nikitalipatov.citizens.model.Citizen;
-import com.nikitalipatov.common.dto.*;
+import com.nikitalipatov.common.dto.request.PersonDtoRequest;
+import com.nikitalipatov.common.dto.response.PersonDtoResponse;
 
 import java.util.List;
 
 public interface CitizenService {
 
-    List<PersonDto> getAll();
+    List<PersonDtoResponse> getAll();
 
-    PersonDto getByName(String name);
+    PersonDtoResponse getByName(String name);
 
-    PersonDto create(PersonRecord personRecord);
+    PersonDtoResponse create(PersonDtoRequest personDtoRequest);
 
     void delete(int id);
 
-    PersonDto edit(int id, PersonRecord personRecord);
-
-//    List<PersonCarDto> getAllCarsByPersonName(String personName);
-//
-//    List<PersonPassportDto> getPassportDataByName(String personName);
-//
-//    List<PersonHouseDto> findAllByStreet(String street);
-//
-//    List<PersonHouseDto> getHousesByPersonName(String personName);
+    PersonDtoResponse edit(int id, PersonDtoRequest personDtoRequest);
 
     Citizen getPerson(int personId);
 

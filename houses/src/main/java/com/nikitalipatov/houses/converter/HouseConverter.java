@@ -1,7 +1,7 @@
 package com.nikitalipatov.houses.converter;
 
-import com.nikitalipatov.common.dto.HouseDto;
-import com.nikitalipatov.common.dto.HouseRecord;
+import com.nikitalipatov.common.dto.response.HouseDtoResponse;
+import com.nikitalipatov.common.dto.request.HouseDtoRequest;
 import com.nikitalipatov.houses.model.House;
 import com.nikitalipatov.houses.model.HousePerson;
 import org.springframework.stereotype.Component;
@@ -9,15 +9,14 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Component
 public class HouseConverter {
 
-    public House toEntity(HouseRecord houseRecord) {
+    public House toEntity(HouseDtoRequest houseDtoRequest) {
         return House.builder()
-                .street(houseRecord.street())
-                .number(houseRecord.number())
+                .street(houseDtoRequest.street())
+                .number(houseDtoRequest.number())
                 .build();
     }
 
@@ -28,15 +27,15 @@ public class HouseConverter {
                 .build();
     }
 
-    public House toEntityEdit(House house, HouseRecord houseRecord) {
+    public House toEntityEdit(House house, HouseDtoRequest houseDtoRequest) {
         return house.toBuilder()
-                .street(houseRecord.street())
-                .number(houseRecord.number())
+                .street(houseDtoRequest.street())
+                .number(houseDtoRequest.number())
                 .build();
     }
 
-    public HouseDto toDto(House house) {
-        return HouseDto.builder()
+    public HouseDtoResponse toDto(House house) {
+        return HouseDtoResponse.builder()
                 .street(house.getStreet())
                 .number(house.getNumber())
                 .citizenIds(house.getHousePerson() == null ? null : house.getHousePerson()
@@ -46,8 +45,8 @@ public class HouseConverter {
                 .build();
     }
 
-    public List<HouseDto> toDto(List<House> houseList) {
-        var houses = new ArrayList<HouseDto>();
+    public List<HouseDtoResponse> toDto(List<House> houseList) {
+        var houses = new ArrayList<HouseDtoResponse>();
         for (House house : houseList) {
             houses.add(toDto(house));
         }

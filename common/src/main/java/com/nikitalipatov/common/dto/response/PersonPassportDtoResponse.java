@@ -1,11 +1,11 @@
-package com.nikitalipatov.common.dto;
+package com.nikitalipatov.common.dto.response;
 
 import lombok.Builder;
 import lombok.Data;
 
 @Data
 @Builder
-public class PersonPassportDto {
+public class PersonPassportDtoResponse {
     private String name;
     private int age;
     private String sex;
