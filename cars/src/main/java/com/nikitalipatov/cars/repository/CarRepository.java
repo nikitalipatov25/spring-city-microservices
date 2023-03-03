@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface CarRepository extends JpaRepository<Car, Integer> {
     void deleteAllByIdIn(List<Integer> ids);
+    void deleteAllByOwnerId(int personId);
+    List<Car> findAllByOwnerId(int personId);
 }

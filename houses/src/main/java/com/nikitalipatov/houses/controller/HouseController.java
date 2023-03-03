@@ -22,6 +22,18 @@ public class HouseController {
         return houseService.getAll();
     }
 
+    @PutMapping(value = "{houseId}/{personId}")
+    @ResponseStatus(value = HttpStatus.ACCEPTED)
+    public HouseDto addCitizen(@PathVariable int houseId, @PathVariable int personId) {
+        return houseService.addCitizen(houseId, personId);
+    }
+
+    @DeleteMapping(value = "/delete/person/{personId}")
+    @ResponseStatus(value = HttpStatus.ACCEPTED)
+    public void removePerson(@PathVariable int personId) {
+        houseService.removePerson(personId);
+    }
+
     @PostMapping(value = "/create")
     @ResponseStatus(value = HttpStatus.ACCEPTED)
     public HouseDto create(@RequestBody HouseRecord houseRecord) {

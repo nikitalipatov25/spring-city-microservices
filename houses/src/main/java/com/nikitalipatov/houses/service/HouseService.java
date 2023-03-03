@@ -17,4 +17,8 @@ public interface HouseService {
     HouseDto edit(int houseId, HouseRecord houseRecord);
 
     House getHouse(int houseId);
+
+    void removePerson(int personId);
+
+    HouseDto addCitizen(int houseId, int personId);
 }

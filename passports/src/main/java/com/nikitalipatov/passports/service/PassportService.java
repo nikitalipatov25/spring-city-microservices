@@ -1,12 +1,13 @@
 package com.nikitalipatov.passports.service;
 
-import com.nikitalipatov.common.dto.PassportRecord;
-import com.nikitalipatov.passports.model.Passport;
+import com.nikitalipatov.common.dto.PassportDto;
+
 
 public interface PassportService {
 
-    Passport create(PassportRecord passportRecord);
+    PassportDto create(int personId);
 
-    void delete(int id);
+    void delete(int personId);
 
+    PassportDto getByOwnerId(int personId);
 }

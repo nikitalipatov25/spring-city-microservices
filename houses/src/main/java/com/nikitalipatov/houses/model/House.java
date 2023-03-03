@@ -3,6 +3,8 @@ package com.nikitalipatov.houses.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @Entity
 @Table(name = "house")
 @AllArgsConstructor
@@ -16,13 +18,12 @@ public class House {
     @SequenceGenerator(name = "house_seq", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "house_seq")
     private int id;
-    private String city;
+
     private String street;
+
     private String number;
 
-    public House(String city, String street, String number) {
-        this.city = city;
-        this.street = street;
-        this.number = number;
-    }
+    @OneToMany(mappedBy = "house", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    private List<HousePerson> housePerson;
+
 }

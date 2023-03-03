@@ -15,29 +15,29 @@ public class CitizenController {
 
     private final CitizenService personService;
 
-    @GetMapping(value = "/custom/house/{street}")
-    @ResponseStatus(value = HttpStatus.ACCEPTED)
-    public List<PersonHouseDto> getAllByStreet(@PathVariable String street) {
-        return personService.findAllByStreet(street);
-    }
-
-    @GetMapping(value = "/custom/cars/{name}")
-    @ResponseStatus(value = HttpStatus.ACCEPTED)
-    public List<PersonCarDto> getCarsByPersonName(@PathVariable String name) {
-        return personService.getAllCarsByPersonName(name);
-    }
-
-    @GetMapping(value = "/custom/houses/{name}")
-    @ResponseStatus(value = HttpStatus.ACCEPTED)
-    public List<PersonHouseDto> getHousesByPersonName(@PathVariable String name) {
-        return personService.getHousesByPersonName(name);
-    }
-
-    @GetMapping(value = "/custom/list/{personName}")
-    @ResponseStatus(value = HttpStatus.ACCEPTED)
-    public List<PersonPassportDto> getPassportDataByName(@PathVariable String personName) {
-        return personService.getPassportDataByName(personName);
-    }
+//    @GetMapping(value = "/custom/house/{street}")
+//    @ResponseStatus(value = HttpStatus.ACCEPTED)
+//    public List<PersonHouseDto> getAllByStreet(@PathVariable String street) {
+//        return personService.findAllByStreet(street);
+//    }
+//
+//    @GetMapping(value = "/custom/cars/{name}")
+//    @ResponseStatus(value = HttpStatus.ACCEPTED)
+//    public List<PersonCarDto> getCarsByPersonName(@PathVariable String name) {
+//        return personService.getAllCarsByPersonName(name);
+//    }
+//
+//    @GetMapping(value = "/custom/houses/{name}")
+//    @ResponseStatus(value = HttpStatus.ACCEPTED)
+//    public List<PersonHouseDto> getHousesByPersonName(@PathVariable String name) {
+//        return personService.getHousesByPersonName(name);
+//    }
+//
+//    @GetMapping(value = "/custom/list/{personName}")
+//    @ResponseStatus(value = HttpStatus.ACCEPTED)
+//    public List<PersonPassportDto> getPassportDataByName(@PathVariable String personName) {
+//        return personService.getPassportDataByName(personName);
+//    }
 
     @GetMapping(value = "/list")
     @ResponseStatus(value = HttpStatus.ACCEPTED)
@@ -57,11 +57,11 @@ public class CitizenController {
         return personService.create(personRecord);
     }
 
-    @PutMapping(value = "/add/{pid}/house/{hid}")
-    @ResponseStatus(value = HttpStatus.ACCEPTED)
-    public PersonDto addHouse(@PathVariable int pid, @PathVariable int hid) {
-        return personService.addHouse(pid, hid);
-    }
+//    @PutMapping(value = "/add/{pid}/house/{hid}")
+//    @ResponseStatus(value = HttpStatus.ACCEPTED)
+//    public PersonDto addHouse(@PathVariable int pid, @PathVariable int hid) {
+//        return personService.addHouse(pid, hid);
+//    }
 
     @PutMapping(value = "/edit/{id}")
     @ResponseStatus(value = HttpStatus.ACCEPTED)

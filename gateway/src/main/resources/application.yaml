@@ -14,10 +14,10 @@ spring:
           predicates:
             - Path=/api/passport/**
         - id: carModule
-            uri: http://localhost:8081/
-            predicates:
-              - Path=/api/car**
+          uri: http://localhost:8081/
+          predicates:
+            - Path=/api/car**
         - id: houseModule
-            uri: http://localhost:8083/
-            predicates:
-              - Path=/api/house/**
+          uri: http://localhost:8083/
+          predicates:
+            - Path=/api/house/**

@@ -1,5 +1,6 @@
 package com.nikitalipatov.citizens.service.impl;
 
+import com.nikitalipatov.cars.service.CarService;
 import com.nikitalipatov.citizens.converter.PersonConverter;
 import com.nikitalipatov.citizens.model.Citizen;
 import com.nikitalipatov.citizens.repository.CitizenRepository;
@@ -12,46 +13,60 @@ import com.nikitalipatov.passports.service.PassportService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
 public class CitizenServiceImpl implements CitizenService {
 
     private final CitizenRepository personRepository;
-    private final PassportService passportService;
-    private final HouseService houseService;
+    //private final CarService carService;
     private final PersonConverter converter;
+    //private final HouseService houseService;
+    //private final PassportService passportService;
+    private final RestTemplate restTemplate;
+
+
+
+//    @Override
+//    public List<PersonHouseDto> findAllByStreet(String street) {
+//        var result = personRepository.findAllByStreet(street);
+//        return converter.toPersonHouseDto(result, street);
+//    }
+//
+//    @Override
+//    public List<PersonPassportDto> getPassportDataByName(String personName) {
+//        var result = personRepository.findPassportDataByFullNameLike(personName);
+//        return converter.toPersonPassportDto(result);
+//    }
+//
+//    @Override
+//    public List<PersonCarDto> getAllCarsByPersonName(String personName) {
+//        var result = personRepository.findCarsByFullName(personName);
+//        System.out.println(result);
+//        return converter.toPersonCarDto(result);
+//    }
+//
+//    @Override
+//    public List<PersonHouseDto> getHousesByPersonName(String personName) {
+//        return converter.toPersonHouseDto(personRepository.findHousesByFullName(personName));
+//    }
 
     @Override
-    public List<PersonHouseDto> findAllByStreet(String street) {
-        var result = personRepository.findAllByStreet(street);
-        return converter.toPersonHouseDto(result, street);
-    }
-
-    @Override
-    public List<PersonPassportDto> getPassportDataByName(String personName) {
-        var result = personRepository.findPassportDataByFullNameLike(personName);
-        return converter.toPersonPassportDto(result);
-    }
-
-    @Override
-    public List<PersonCarDto> getAllCarsByPersonName(String personName) {
-        var result = personRepository.findCarsByFullName(personName);
-        System.out.println(result);
-        return converter.toPersonCarDto(result);
-    }
-
-    @Override
-    public List<PersonHouseDto> getHousesByPersonName(String personName) {
-        return converter.toPersonHouseDto(personRepository.findHousesByFullName(personName));
-    }
-
-    @Override
+    @Transactional
     public List<PersonDto> getAll() {
-        return converter.toDto(personRepository.findAll());
+        var persons = personRepository.findAll();
+        List<PersonDto> personDtos = new ArrayList<>();
+        PersonDto person;
+        for (int i = 0; i < persons.size(); i++) {
+            PassportDto passport =
+                    restTemplate.getForObject("http://localhost:8080/api/passport/get/{personId}", PassportDto.class, persons.get(i).getId());
+            person = converter.toDto(persons.get(i), Objects.requireNonNull(passport));
+            personDtos.add(person);
+        }
+        return personDtos;
     }
 
     @Override
@@ -62,37 +77,42 @@ public class CitizenServiceImpl implements CitizenService {
     @Override
     @Transactional
     public PersonDto create(PersonRecord personRecord) {
-        Citizen person = new Citizen(personRecord.fullName(), personRecord.age(),
-                passportService.create(personRecord.passportRecord())
-        );
-        return converter.toDto(personRepository.save(person));
+        Citizen person = personRepository.save(converter.toEntity(personRecord));
+        var passport = restTemplate.postForObject("http://localhost:8080/api/passport/create", person.getId(), PassportDto.class);
+        return converter.toDto(person, Objects.requireNonNull(passport));
     }
 
-    @Override
-    @Transactional
-    public PersonDto addHouse(int personId, int houseId) {
-        Citizen person = getPerson(personId);
-        House house = houseService.getHouse(houseId);
-        Set<House> personHouses = person.getHouse();
-        personHouses.add(house);
-        person.setHouse(personHouses);
-        return converter.toDto(personRepository.save(person));
-    }
+//    @Override
+//    @Transactional
+//    public PersonDto addHouse(int personId, int houseId) {
+//        Citizen person = getPerson(personId);
+//        House house = houseService.getHouse(houseId);
+//        Set<House> personHouses = person.getHouse();
+//        personHouses.add(house);
+//        person.setHouse(personHouses);
+//        return converter.toDto(personRepository.save(person));
+//    }
 
     @Override
     @Transactional
     public void delete(int personId) {
-        Citizen person = getPerson(personId);
-        passportService.delete(personId);
-        person.setHouse(null);
+        //passportService.delete(personId);
+        restTemplate.delete("http://localhost:8080/api/passport/delete/{personId}", personId);
+        //carService.deletePersonCars(personId);
+        restTemplate.delete("http://localhost:8080/api/car/delete/person/{personId}", personId);
+        //houseService.removePerson(personId);
+        restTemplate.delete("http://localhost:8080/api/house/delete/person/{personId}", personId);
         personRepository.deleteById(personId);
+        //delete passport
+        //delete person cars
+        //delete from houses
     }
 
     @Override
     @Transactional
     public PersonDto edit(int personId, PersonRecord personRecord) {
         Citizen person = getPerson(personId);
-        return converter.toDto(personRepository.save(converter.toEntity(person, personRecord)));
+        return converter.toDto(personRepository.save(converter.toEntityEdit(person, personRecord)));
     }
 
     @Override

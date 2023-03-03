@@ -1,7 +1,9 @@
 package com.nikitalipatov.passports.service.impl;
 
+import com.nikitalipatov.common.dto.PassportDto;
 import com.nikitalipatov.common.dto.PassportRecord;
 import com.nikitalipatov.common.error.ResourceNotFoundException;
+import com.nikitalipatov.passports.converter.PassportConverter;
 import com.nikitalipatov.passports.model.Passport;
 import com.nikitalipatov.passports.repository.PassportRepository;
 import com.nikitalipatov.passports.service.PassportService;
@@ -13,25 +15,25 @@ import org.springframework.stereotype.Service;
 public class PassportServiceImpl implements PassportService {
 
     private final PassportRepository passportRepository;
+    private final PassportConverter passportConverter;
 
     @Override
-    public Passport create(PassportRecord passportRecord) {
-        Passport passport = new Passport(passportRecord.serial(), passportRecord.number(),
-                passportRecord.address(), passportRecord.addressFact(),
-                passportRecord.placeOfBirth(), passportRecord.dateOfBirth(), passportRecord.sex(),
-                passportRecord.issued(), passportRecord.issuedBy());
-        return passportRepository.save(passport);
+    public PassportDto create(int personId) {
+        return passportConverter.toDto(passportRepository.save(passportConverter.toEntity(personId)));
+    }
+
+    public PassportDto getByOwnerId(int personId) {
+        return passportConverter.toDto(getPassport(personId));
     }
 
     @Override
-    public void delete(int passportId) {
-        var passport =getPassport(passportId);
-        passportRepository.delete(passport);
+    public void delete(int personId) {
+        passportRepository.deleteByOwnerId(personId);
     }
 
-    public Passport getPassport(int passportId) {
-        return passportRepository.findById(passportId).orElseThrow(
-                () -> new ResourceNotFoundException("No such passport with id " + passportId)
+    public Passport getPassport(int personId) {
+        return passportRepository.findById(personId).orElseThrow(
+                () -> new ResourceNotFoundException("No such passport with owner id " + personId)
         );
     }
 }

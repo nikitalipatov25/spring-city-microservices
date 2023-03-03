@@ -3,7 +3,6 @@ package com.nikitalipatov.cars.service.impl;
 import com.nikitalipatov.cars.model.Car;
 import com.nikitalipatov.cars.repository.CarRepository;
 import com.nikitalipatov.cars.service.CarService;
-import com.nikitalipatov.citizens.service.CitizenService;
 import com.nikitalipatov.cars.converter.CarConverter;
 import com.nikitalipatov.common.dto.CarDto;
 import com.nikitalipatov.common.dto.CarRecord;
@@ -20,7 +19,6 @@ public class CarServiceImpl implements CarService {
 
     private final CarRepository carRepository;
     private final CarConverter carConverter;
-    private final CitizenService personService;
 
     @Override
     public List<CarDto> getAll() {
@@ -30,21 +28,26 @@ public class CarServiceImpl implements CarService {
     @Override
     @Transactional
     public CarDto create(int personId, CarRecord carRecord) {
-        Car car = new Car(carRecord.gosNumber(), carRecord.model(), carRecord.type(), carRecord.color(), carRecord.name());
-        car.setPerson(personService.getPerson(personId));
-        System.out.println(car);
-        return carConverter.toDto(carRepository.save(car));
+        return carConverter.toDto(carRepository.save(carConverter.toEntity(carRecord, personId)));
     }
 
-    @Override
-    @Transactional
-    public List<Integer> create(List<CarRecord> carRecords) {
-        var cars = carConverter.toEntity(carRecords);
-        carRepository.saveAll(cars);
-        return cars.stream()
-                .map((Car::getId))
-                .toList();
+    public List<CarDto> getCitizenCar(int personId) {
+        return carConverter.toDto(carRepository.findAllByOwnerId(personId));
     }
+
+    public void deletePersonCars(int personId) {
+        carRepository.deleteAllByOwnerId(personId);
+    }
+
+//    @Override
+//    @Transactional
+//    public List<Integer> create(List<CarRecord> carRecords) {
+//        var cars = carConverter.toEntity(carRecords);
+//        carRepository.saveAll(cars);
+//        return cars.stream()
+//                .map((Car::getId))
+//                .toList();
+//    }
 
     @Override
     @Transactional

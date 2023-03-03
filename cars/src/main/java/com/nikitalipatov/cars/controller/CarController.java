@@ -22,11 +22,23 @@ public class CarController {
         return carService.create(userId, carRecord);
     }
 
-    @PostMapping(value = "/create")
+    @GetMapping(value = "/list/{personId}")
     @ResponseStatus(value = HttpStatus.ACCEPTED)
-    public List<Integer> createCars(@RequestBody List<CarRecord> carRecord) {
-        return carService.create(carRecord);
+    public List<CarDto> getCitizenCar(@PathVariable int personId) {
+        return carService.getCitizenCar(personId);
     }
+
+    @DeleteMapping(value = "/delete/person/{personId}")
+    @ResponseStatus(value = HttpStatus.ACCEPTED)
+    public void deletePersonCars(@PathVariable int personId) {
+        carService.deletePersonCars(personId);
+    }
+
+//    @PostMapping(value = "/create")
+//    @ResponseStatus(value = HttpStatus.ACCEPTED)
+//    public List<Integer> createCars(@RequestBody List<CarRecord> carRecord) {
+//        return carService.create(carRecord);
+//    }
 
     @GetMapping(value = "/list")
     @ResponseStatus(value = HttpStatus.ACCEPTED)

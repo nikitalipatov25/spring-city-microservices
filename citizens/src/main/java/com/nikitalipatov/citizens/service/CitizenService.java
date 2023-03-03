@@ -13,19 +13,17 @@ public interface CitizenService {
 
     PersonDto create(PersonRecord personRecord);
 
-    PersonDto addHouse(int personId, int houseId);
-
     void delete(int id);
 
     PersonDto edit(int id, PersonRecord personRecord);
 
-    List<PersonCarDto> getAllCarsByPersonName(String personName);
-
-    List<PersonPassportDto> getPassportDataByName(String personName);
-
-    List<PersonHouseDto> findAllByStreet(String street);
-
-    List<PersonHouseDto> getHousesByPersonName(String personName);
+//    List<PersonCarDto> getAllCarsByPersonName(String personName);
+//
+//    List<PersonPassportDto> getPassportDataByName(String personName);
+//
+//    List<PersonHouseDto> findAllByStreet(String street);
+//
+//    List<PersonHouseDto> getHousesByPersonName(String personName);
 
     Citizen getPerson(int personId);
 

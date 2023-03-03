@@ -13,9 +13,9 @@ public class PersonDto {
     private String name;
     private int age;
     private String sex;
-    private int serial;
-    private int number;
-    private List<CarDto> car;
-    private List<HouseDto> house;
+    private int passportSerial;
+    private int passportNumber;
+//    private List<CarDto> car;
+//    private List<HouseDto> house;
     //private List<BankDto> bank;
 }

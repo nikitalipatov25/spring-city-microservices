@@ -19,7 +19,6 @@ public class CarConverter {
                 .gosNumber(carRecord.gosNumber())
                 .model(carRecord.model())
                 .price(carRecord.price())
-                .type(carRecord.type())
                 .build();
     }
 
@@ -36,7 +35,7 @@ public class CarConverter {
 //                .build();
 //    }
 
-    public Car toEntity(CarRecord carRecord) {
+    public Car toEntity(CarRecord carRecord, int personId) {
         return Car.builder()
                 .color(carRecord.color())
                 .model(carRecord.model())
@@ -44,17 +43,17 @@ public class CarConverter {
                 .gosNumber(carRecord.gosNumber())
                 .model(carRecord.model())
                 .price(carRecord.price())
-                .type(carRecord.type())
+                .ownerId(personId)
                 .build();
     }
 
-    public List<Car> toEntity(List<CarRecord> carRecordList) {
-        List<Car> cars = new ArrayList<>();
-        for (CarRecord carRecord : carRecordList) {
-            cars.add(toEntity(carRecord));
-        }
-        return cars;
-    }
+//    public List<Car> toEntity(List<CarRecord> carRecordList) {
+//        List<Car> cars = new ArrayList<>();
+//        for (CarRecord carRecord : carRecordList) {
+//            cars.add(toEntity(carRecord));
+//        }
+//        return cars;
+//    }
 
     public CarDto toDto(Car car) {
         return CarDto.builder()
@@ -62,7 +61,6 @@ public class CarConverter {
                 .name(car.getName())
                 .color(car.getColor())
                 .model(car.getModel())
-                .type(car.getType())
                 .price(car.getPrice())
                 .build();
     }
@@ -75,8 +73,4 @@ public class CarConverter {
         return cars;
     }
 
-
-    public Car toEntityForShop(CarRecord carRecord) {
-        return new Car(carRecord.gosNumber(), carRecord.model(), carRecord.name(), carRecord.type(), carRecord.color(), carRecord.price());
-    }
 }

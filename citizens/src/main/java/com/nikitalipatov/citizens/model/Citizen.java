@@ -1,19 +1,7 @@
 package com.nikitalipatov.citizens.model;
 
-
-import com.nikitalipatov.cars.model.Car;
-import com.nikitalipatov.houses.model.House;
-import com.nikitalipatov.passports.model.Passport;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.hibernate.annotations.BatchSize;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
-
-import java.util.Set;
+import lombok.*;
 
 @Entity
 @Table(name ="person")
@@ -21,6 +9,7 @@ import java.util.Set;
 @NoArgsConstructor
 @Getter
 @Setter
+@Builder(toBuilder = true)
 public class Citizen {
 
     @Id
@@ -30,28 +19,8 @@ public class Citizen {
 
     private String fullName;
 
-
     private int age;
 
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
-    private Passport passport;
+    private String sex;
 
-    @ManyToMany()
-    @JoinTable(name = "house_person",
-            joinColumns = @JoinColumn(name = "person_id"),
-            inverseJoinColumns = @JoinColumn(name = "house_id")
-    )
-    @Fetch(FetchMode.SUBSELECT)
-    @BatchSize(size = 10)
-    private Set<House> house;
-
-    @OneToMany(mappedBy = "person", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-    @Fetch(FetchMode.SUBSELECT)
-    private Set<Car> car;
-
-    public Citizen(String fullName, int age, Passport passport) {
-        this.fullName = fullName;
-        this.age = age;
-        this.passport = passport;
-    }
 }

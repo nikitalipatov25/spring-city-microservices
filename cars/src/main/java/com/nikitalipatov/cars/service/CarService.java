@@ -12,11 +12,15 @@ public interface CarService {
 
     CarDto create(int personId, CarRecord carRecord);
 
-    List<Integer> create(List<CarRecord> carRecord);
+//    List<Integer> create(List<CarRecord> carRecord);
 
     void deleteCar(int carId);
 
     CarDto editCar(int carId, CarRecord carRecord);
 
     Car getCar(int carId);
+
+    List<CarDto> getCitizenCar(int personId);
+
+    void deletePersonCars(int personId);
 }
