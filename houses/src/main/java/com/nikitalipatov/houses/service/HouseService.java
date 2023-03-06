@@ -2,6 +2,7 @@ package com.nikitalipatov.houses.service;
 
 import com.nikitalipatov.common.dto.response.HouseDtoResponse;
 import com.nikitalipatov.common.dto.request.HouseDtoRequest;
+import com.nikitalipatov.common.dto.response.HousePersonDto;
 import com.nikitalipatov.houses.model.House;
 
 import java.util.List;
@@ -18,7 +19,7 @@ public interface HouseService {
 
     House getHouse(int houseId);
 
-    void removePerson(int personId);
+    void removePerson(int houseId, int personId);
 
-    HouseDtoResponse addCitizen(int houseId, int personId);
+    HousePersonDto addCitizen(int houseId, int personId);
 }

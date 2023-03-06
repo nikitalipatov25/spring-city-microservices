@@ -8,6 +8,7 @@ import com.nikitalipatov.common.dto.request.PersonDtoRequest;
 import com.nikitalipatov.common.dto.response.PassportDtoResponse;
 import com.nikitalipatov.common.dto.response.PersonDtoResponse;
 import com.nikitalipatov.common.error.ResourceNotFoundException;
+import com.nikitalipatov.common.feign.PassportClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,13 +24,13 @@ public class CitizenServiceImpl implements CitizenService {
     private final CitizenRepository personRepository;
     private final PersonConverter converter;
     private final RestTemplate restTemplate;
+    private final PassportClient passportClient;
 
     @Override
-    @Transactional
-    public List<PersonDtoResponse> getAll() {
+      public List<PersonDtoResponse> getAll() {
         var persons = personRepository.findAll();
         List<Integer> ownerIds = persons.stream().map(Citizen::getId).collect(Collectors.toList());
-        List<PassportDtoResponse> passportDtoResponses = restTemplate.getForObject("http://localhost:8080/api/passport/get", PassportDtoResponse.class, ownerIds);
+        List<PassportDtoResponse> passportDtoResponses = passportClient.getPassportsByOwnerIds(ownerIds);
         List<PersonDtoResponse> personDtoResponses = new ArrayList<>();
         PersonDtoResponse person;
         for (int i = 0; i < persons.size(); i++) {
@@ -45,17 +46,16 @@ public class CitizenServiceImpl implements CitizenService {
     }
 
     @Override
-    @Transactional
-    public PersonDtoResponse create(PersonDtoRequest personDtoRequest) {
+       public PersonDtoResponse create(PersonDtoRequest personDtoRequest) {
         Citizen person = personRepository.save(converter.toEntity(personDtoRequest));
-        var passport = restTemplate.postForObject("http://localhost:8080/api/passport/create", person.getId(), PassportDtoResponse.class);
+        var passport = passportClient.create(person.getId());
         return converter.toDto(person, Objects.requireNonNull(passport));
     }
 
     @Override
     @Transactional
     public void delete(int personId) {
-        // todo rework Если например в сервисе домов что то пойдет не так и вернется ошибка, то транзакция тебя тут не спасет и отката в сервисе
+        // todo Если например в сервисе домов что то пойдет не так и вернется ошибка, то транзакция тебя тут не спасет и отката в сервисе
         //  домов и паспортов не произойдет, в результате ты получишь не консистентные данные, что обычно весьма критично для бизнеса.
         //  Вообще этот метод самый сложный во всем проекте, нужно подумать как сделать так, что бы если какой то из сервисов недоступен
         //  у нас не ломалась логика
@@ -66,7 +66,6 @@ public class CitizenServiceImpl implements CitizenService {
     }
 
     @Override
-    @Transactional
     public PersonDtoResponse edit(int personId, PersonDtoRequest personDtoRequest) {
         Citizen person = getPerson(personId);
         return converter.toDto(personRepository.save(converter.toEntityEdit(person, personDtoRequest)));

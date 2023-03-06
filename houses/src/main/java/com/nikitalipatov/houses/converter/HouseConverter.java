@@ -2,6 +2,7 @@ package com.nikitalipatov.houses.converter;
 
 import com.nikitalipatov.common.dto.response.HouseDtoResponse;
 import com.nikitalipatov.common.dto.request.HouseDtoRequest;
+import com.nikitalipatov.common.dto.response.HousePersonDto;
 import com.nikitalipatov.houses.model.House;
 import com.nikitalipatov.houses.model.HousePerson;
 import org.springframework.stereotype.Component;
@@ -15,22 +16,16 @@ public class HouseConverter {
 
     public House toEntity(HouseDtoRequest houseDtoRequest) {
         return House.builder()
-                .street(houseDtoRequest.street())
-                .number(houseDtoRequest.number())
+                .street(houseDtoRequest.getStreet())
+                .number(houseDtoRequest.getNumber())
                 .build();
     }
 
-    public HousePerson toEntity(int houseId, int personId) {
-        return HousePerson.builder()
-                .houseId(houseId)
-                .personId(personId)
-                .build();
-    }
 
     public House toEntityEdit(House house, HouseDtoRequest houseDtoRequest) {
         return house.toBuilder()
-                .street(houseDtoRequest.street())
-                .number(houseDtoRequest.number())
+                .street(houseDtoRequest.getStreet())
+                .number(houseDtoRequest.getNumber())
                 .build();
     }
 
@@ -38,10 +33,13 @@ public class HouseConverter {
         return HouseDtoResponse.builder()
                 .street(house.getStreet())
                 .number(house.getNumber())
-                .citizenIds(house.getHousePerson() == null ? null : house.getHousePerson()
-                        .stream()
-                        .map(HousePerson::getPersonId)
-                        .collect(Collectors.toList()))
+                .build();
+    }
+
+    public HousePersonDto toDto(HousePerson housePerson) {
+        return HousePersonDto.builder()
+                .houseId(housePerson.getHousePersonId().getHouseId())
+                .personId(housePerson.getHousePersonId().getOwnerId())
                 .build();
     }
 

@@ -1,6 +1,7 @@
 package com.nikitalipatov.passports.controller;
 
 import com.nikitalipatov.common.dto.response.PassportDtoResponse;
+import com.nikitalipatov.common.feign.PassportClient;
 import com.nikitalipatov.passports.service.PassportService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,7 +22,7 @@ public class PassportController {
         return passportService.create(personId);
     }
 
-    @GetMapping(value = "/get")
+    @PostMapping(value = "/get")
     @ResponseStatus(value = HttpStatus.ACCEPTED)
     public List<PassportDtoResponse> getPassportsByOwnerIds(@RequestBody List<Integer> ownersId) {
         return passportService.getAllByOwnerIds(ownersId);

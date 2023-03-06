@@ -2,6 +2,7 @@ package com.nikitalipatov.houses.controller;
 
 import com.nikitalipatov.common.dto.response.HouseDtoResponse;
 import com.nikitalipatov.common.dto.request.HouseDtoRequest;
+import com.nikitalipatov.common.dto.response.HousePersonDto;
 import com.nikitalipatov.houses.service.HouseService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -24,14 +25,14 @@ public class HouseController {
 
     @PutMapping(value = "{houseId}/{personId}")
     @ResponseStatus(value = HttpStatus.ACCEPTED)
-    public HouseDtoResponse addCitizen(@PathVariable int houseId, @PathVariable int personId) {
+    public HousePersonDto addCitizen(@PathVariable int houseId, @PathVariable int personId) {
         return houseService.addCitizen(houseId, personId);
     }
 
-    @DeleteMapping(value = "/delete/person/{personId}")
+    @DeleteMapping(value = "/delete/{houseId}/{personId}")
     @ResponseStatus(value = HttpStatus.ACCEPTED)
-    public void removePerson(@PathVariable int personId) {
-        houseService.removePerson(personId);
+    public void removePerson(@PathVariable int houseId, @PathVariable int personId) {
+        houseService.removePerson(houseId, personId);
     }
 
     @PostMapping(value = "/create")

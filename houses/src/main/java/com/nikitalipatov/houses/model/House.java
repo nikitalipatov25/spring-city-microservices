@@ -23,7 +23,5 @@ public class House {
 
     private String number;
 
-    @OneToMany(mappedBy = "house", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-    private List<HousePerson> housePerson;
 
 }

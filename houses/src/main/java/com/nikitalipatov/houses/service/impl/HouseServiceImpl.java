@@ -2,8 +2,10 @@ package com.nikitalipatov.houses.service.impl;
 
 import com.nikitalipatov.common.dto.response.HouseDtoResponse;
 import com.nikitalipatov.common.dto.request.HouseDtoRequest;
+import com.nikitalipatov.common.dto.response.HousePersonDto;
 import com.nikitalipatov.common.error.ResourceNotFoundException;
 import com.nikitalipatov.houses.converter.HouseConverter;
+import com.nikitalipatov.houses.key.HousePersonId;
 import com.nikitalipatov.houses.model.House;
 import com.nikitalipatov.houses.model.HousePerson;
 import com.nikitalipatov.houses.repository.HousePersonRepository;
@@ -29,31 +31,25 @@ public class HouseServiceImpl implements HouseService {
     }
 
     @Override
-    @Transactional
     public HouseDtoResponse create(HouseDtoRequest houseDtoRequest) {
         return houseConverter.toDto(houseRepository.save(houseConverter.toEntity(houseDtoRequest)));
     }
 
-    public HouseDtoResponse addCitizen(int houseId, int personId) {
-        var house = getHouse(houseId);
-        List<HousePerson> housePeople = house.getHousePerson();
-        housePeople.add(housePersonRepository.save(houseConverter.toEntity(houseId, personId)));
-        house.setHousePerson(housePeople);
-        return houseConverter.toDto(houseRepository.save(house));
+    public HousePersonDto addCitizen(int houseId, int personId) {
+        HousePersonId housePersonId = new HousePersonId(houseId, personId);
+        return houseConverter.toDto(housePersonRepository.save(new HousePerson(housePersonId)));
     }
 
-    public void removePerson(int personId) {
-        housePersonRepository.deleteAllByPersonId(personId);
+    public void removePerson(int houseId, int personId) {
+        housePersonRepository.deleteAllByHousePersonId(new HousePersonId(houseId, personId));
     }
 
     @Override
-    @Transactional
     public void delete(int houseId) {
         houseRepository.delete(getHouse(houseId));
     }
 
     @Override
-    @Transactional
     public HouseDtoResponse edit(int houseId, HouseDtoRequest houseDtoRequest) {
         var house = getHouse(houseId);
         return houseConverter.toDto(houseRepository.save(houseConverter.toEntityEdit(house, houseDtoRequest)));

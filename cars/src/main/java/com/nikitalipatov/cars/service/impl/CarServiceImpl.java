@@ -26,7 +26,6 @@ public class CarServiceImpl implements CarService {
     }
 
     @Override
-    @Transactional
     public CarDtoResponse create(int personId, CarDtoRequest carDtoRequest) {
         return carConverter.toDto(carRepository.save(carConverter.toEntity(carDtoRequest, personId)));
     }
@@ -40,13 +39,11 @@ public class CarServiceImpl implements CarService {
     }
 
     @Override
-    @Transactional
     public void deleteCar(int carId) {
         carRepository.delete(getCar(carId));
     }
 
     @Override
-    @Transactional
     public CarDtoResponse editCar(int carId, CarDtoRequest carDtoRequest) {
         Car car = getCar(carId);
         return carConverter.toDto(carRepository.save(carConverter.toEntity(car, carDtoRequest)));

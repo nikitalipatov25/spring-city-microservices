@@ -1,5 +1,6 @@
 package com.nikitalipatov.houses.model;
 
+import com.nikitalipatov.houses.key.HousePersonId;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -12,16 +13,8 @@ import lombok.*;
 @Builder(toBuilder = true)
 public class HousePerson {
 
-    // todo Это у тебя уже не таблица посредник, первая проблема, например тут могут быть дубликаты связки houseId и personId,
-    //  тут лучше использовать составной ключ, Поресерчи в сторону @EmbeddedId
+    @EmbeddedId
+    private HousePersonId housePersonId;
 
-    @Id
-    @SequenceGenerator(name = "house_person_seq", allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "house_person_seq")
-    private int recordId;
-    private int houseId;
-    private int personId;
-    @ManyToOne()
-    @JoinColumn(name = "h_id")
-    private House house;
 }
+
