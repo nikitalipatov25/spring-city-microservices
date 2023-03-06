@@ -40,8 +40,8 @@ public class HouseServiceImpl implements HouseService {
         return houseConverter.toDto(housePersonRepository.save(new HousePerson(housePersonId)));
     }
 
-    public void removePerson(int houseId, int personId) {
-        housePersonRepository.deleteAllByHousePersonId(new HousePersonId(houseId, personId));
+    public void removePerson(int personId) {
+        housePersonRepository.deleteAllByHousePersonId(personId);
     }
 
     @Override

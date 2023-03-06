@@ -12,18 +12,16 @@ import java.util.List;
 @RestController
 @RequestMapping(value = "/api/passport")
 @RequiredArgsConstructor
-public class PassportController {
+public class PassportController implements PassportClient {
 
     private final PassportService passportService;
 
-    @PostMapping(value = "/create")
-    @ResponseStatus(value = HttpStatus.ACCEPTED)
+    @Override
     public PassportDtoResponse create(@RequestBody int personId) {
         return passportService.create(personId);
     }
 
-    @PostMapping(value = "/get")
-    @ResponseStatus(value = HttpStatus.ACCEPTED)
+    @Override
     public List<PassportDtoResponse> getPassportsByOwnerIds(@RequestBody List<Integer> ownersId) {
         return passportService.getAllByOwnerIds(ownersId);
     }
@@ -34,8 +32,7 @@ public class PassportController {
         return passportService.getByOwnerId(personId);
     }
 
-    @DeleteMapping(value = "/delete/{personId}")
-    @ResponseStatus(value = HttpStatus.ACCEPTED)
+    @Override
     public void delete(@PathVariable int personId) {
         passportService.delete(personId);
     }

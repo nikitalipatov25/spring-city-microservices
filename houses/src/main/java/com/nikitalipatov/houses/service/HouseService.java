@@ -19,7 +19,7 @@ public interface HouseService {
 
     House getHouse(int houseId);
 
-    void removePerson(int houseId, int personId);
+    void removePerson(int personId);
 
     HousePersonDto addCitizen(int houseId, int personId);
 }

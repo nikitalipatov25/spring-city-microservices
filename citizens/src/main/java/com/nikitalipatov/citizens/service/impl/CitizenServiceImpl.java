@@ -8,13 +8,16 @@ import com.nikitalipatov.common.dto.request.PersonDtoRequest;
 import com.nikitalipatov.common.dto.response.PassportDtoResponse;
 import com.nikitalipatov.common.dto.response.PersonDtoResponse;
 import com.nikitalipatov.common.error.ResourceNotFoundException;
+import com.nikitalipatov.common.feign.CarClient;
+import com.nikitalipatov.common.feign.HouseClient;
 import com.nikitalipatov.common.feign.PassportClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestTemplate;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -23,8 +26,9 @@ public class CitizenServiceImpl implements CitizenService {
 
     private final CitizenRepository personRepository;
     private final PersonConverter converter;
-    private final RestTemplate restTemplate;
     private final PassportClient passportClient;
+    private final HouseClient houseClient;
+    private final CarClient carClient;
 
     @Override
       public List<PersonDtoResponse> getAll() {
@@ -32,11 +36,17 @@ public class CitizenServiceImpl implements CitizenService {
         List<Integer> ownerIds = persons.stream().map(Citizen::getId).collect(Collectors.toList());
         List<PassportDtoResponse> passportDtoResponses = passportClient.getPassportsByOwnerIds(ownerIds);
         List<PersonDtoResponse> personDtoResponses = new ArrayList<>();
-        PersonDtoResponse person;
-        for (int i = 0; i < persons.size(); i++) {
-            person = converter.toDto(persons.get(i), Objects.requireNonNull(passportDtoResponses).get(i));
-            personDtoResponses.add(person);
-        }
+        persons.forEach(person -> {
+            PassportDtoResponse passport = passportDtoResponses.get(person.getId());
+            personDtoResponses.add(converter.toDto(person, passport));
+        });
+
+//        PersonDtoResponse person;
+//        for (int i = 0; i < persons.size(); i++) {
+//            var a = passportDtoResponses.get(i);
+//            person = converter.toDto(persons.get(i), Objects.requireNonNull(passportDtoResponses).get(i));
+//            personDtoResponses.add(person);
+//        }
         return personDtoResponses;
     }
 
@@ -59,9 +69,9 @@ public class CitizenServiceImpl implements CitizenService {
         //  домов и паспортов не произойдет, в результате ты получишь не консистентные данные, что обычно весьма критично для бизнеса.
         //  Вообще этот метод самый сложный во всем проекте, нужно подумать как сделать так, что бы если какой то из сервисов недоступен
         //  у нас не ломалась логика
-        restTemplate.delete("http://localhost:8080/api/passport/delete/{personId}", personId);
-        restTemplate.delete("http://localhost:8080/api/car/delete/person/{personId}", personId);
-        restTemplate.delete("http://localhost:8080/api/house/delete/person/{personId}", personId);
+        passportClient.delete(personId);
+        carClient.deletePersonCars(personId);
+        houseClient.removePerson(personId);
         personRepository.deleteById(personId);
     }
 
