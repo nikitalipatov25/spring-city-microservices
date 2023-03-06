@@ -1,4 +1,4 @@
-package com.nikitalipatov.common.dto;
+package com.nikitalipatov.common.dto.response;
 
 import lombok.*;
 
@@ -7,7 +7,7 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class CarDto {
+public class CarDtoResponse {
 
     private String gosNumber;
     private String model;

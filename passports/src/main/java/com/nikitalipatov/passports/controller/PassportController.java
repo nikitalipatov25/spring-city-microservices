@@ -1,32 +1,38 @@
 package com.nikitalipatov.passports.controller;
 
-import com.nikitalipatov.common.dto.PassportDto;
+import com.nikitalipatov.common.dto.response.PassportDtoResponse;
+import com.nikitalipatov.common.feign.PassportClient;
 import com.nikitalipatov.passports.service.PassportService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping(value = "/api/passport")
 @RequiredArgsConstructor
-public class PassportController {
+public class PassportController implements PassportClient {
 
     private final PassportService passportService;
 
-    @PostMapping(value = "/create")
-    @ResponseStatus(value = HttpStatus.ACCEPTED)
-    public PassportDto create(@RequestBody int personId) {
+    @Override
+    public PassportDtoResponse create(@RequestBody int personId) {
         return passportService.create(personId);
+    }
+
+    @Override
+    public List<PassportDtoResponse> getPassportsByOwnerIds(@RequestBody List<Integer> ownersId) {
+        return passportService.getAllByOwnerIds(ownersId);
     }
 
     @GetMapping(value = "/get/{personId}")
     @ResponseStatus(value = HttpStatus.ACCEPTED)
-    public PassportDto getByOwnerId(@PathVariable int personId) {
+    public PassportDtoResponse getByOwnerId(@PathVariable int personId) {
         return passportService.getByOwnerId(personId);
     }
 
-    @DeleteMapping(value = "/delete/{personId}")
-    @ResponseStatus(value = HttpStatus.ACCEPTED)
+    @Override
     public void delete(@PathVariable int personId) {
         passportService.delete(personId);
     }

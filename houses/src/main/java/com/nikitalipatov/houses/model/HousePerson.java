@@ -1,5 +1,6 @@
 package com.nikitalipatov.houses.model;
 
+import com.nikitalipatov.houses.key.HousePersonId;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -12,13 +13,8 @@ import lombok.*;
 @Builder(toBuilder = true)
 public class HousePerson {
 
-    @Id
-    @SequenceGenerator(name = "house_person_seq", allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "house_person_seq")
-    private int recordId;
-    private int houseId;
-    private int personId;
-    @ManyToOne()
-    @JoinColumn(name = "h_id")
-    private House house;
+    @EmbeddedId
+    private HousePersonId housePersonId;
+
 }
+

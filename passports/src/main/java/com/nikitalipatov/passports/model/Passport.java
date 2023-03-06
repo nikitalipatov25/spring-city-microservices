@@ -15,15 +15,7 @@ import java.util.Date;
 public class Passport {
     @Id
     private int ownerId;
-
     private int serial;
-
     private int number;
 
-//    private String addressFact;
-//    private String placeOfBirth;
-//    private Date dateOfBirth;
-//    private String sex;
-//    private Date issued;
-//    private String issuedBy;
 }
