@@ -16,6 +16,7 @@ public class CitizenController {
 
     private final CitizenService personService;
 
+
     @GetMapping(value = "/list")
     @ResponseStatus(value = HttpStatus.ACCEPTED)
     public List<PersonDtoResponse> getAll() {

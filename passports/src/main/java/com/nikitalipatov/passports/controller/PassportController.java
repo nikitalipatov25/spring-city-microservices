@@ -1,5 +1,6 @@
 package com.nikitalipatov.passports.controller;
 
+import com.nikitalipatov.common.dto.request.TDto;
 import com.nikitalipatov.common.dto.response.PassportDtoResponse;
 import com.nikitalipatov.common.feign.PassportClient;
 import com.nikitalipatov.passports.service.PassportService;
@@ -10,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping(value = "/api/passport")
 @RequiredArgsConstructor
 public class PassportController implements PassportClient {
 
@@ -19,6 +19,11 @@ public class PassportController implements PassportClient {
     @Override
     public PassportDtoResponse create(@RequestBody int personId) {
         return passportService.create(personId);
+    }
+
+    @Override
+    public PassportDtoResponse getPassportByPersonId(int personId) {
+        return passportService.getByOwnerId(personId);
     }
 
     @Override

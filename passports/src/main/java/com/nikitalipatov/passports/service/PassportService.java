@@ -1,6 +1,7 @@
 package com.nikitalipatov.passports.service;
 
 import com.nikitalipatov.common.dto.response.PassportDtoResponse;
+import org.springframework.kafka.annotation.KafkaListener;
 
 import java.util.List;
 

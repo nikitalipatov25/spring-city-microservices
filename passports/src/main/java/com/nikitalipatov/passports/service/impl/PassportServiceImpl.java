@@ -3,10 +3,13 @@ package com.nikitalipatov.passports.service.impl;
 import com.nikitalipatov.common.dto.response.PassportDtoResponse;
 import com.nikitalipatov.common.error.ResourceNotFoundException;
 import com.nikitalipatov.passports.converter.PassportConverter;
+import com.nikitalipatov.passports.kafka.PassportListener;
 import com.nikitalipatov.passports.model.Passport;
 import com.nikitalipatov.passports.repository.PassportRepository;
 import com.nikitalipatov.passports.service.PassportService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

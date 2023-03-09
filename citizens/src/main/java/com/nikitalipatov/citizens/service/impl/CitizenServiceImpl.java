@@ -4,7 +4,9 @@ import com.nikitalipatov.citizens.converter.PersonConverter;
 import com.nikitalipatov.citizens.model.Citizen;
 import com.nikitalipatov.citizens.repository.CitizenRepository;
 import com.nikitalipatov.citizens.service.CitizenService;
+import com.nikitalipatov.common.dto.kafka.PersonCreationDto;
 import com.nikitalipatov.common.dto.request.PersonDtoRequest;
+import com.nikitalipatov.common.dto.request.TDto;
 import com.nikitalipatov.common.dto.response.PassportDtoResponse;
 import com.nikitalipatov.common.dto.response.PersonDtoResponse;
 import com.nikitalipatov.common.error.ResourceNotFoundException;
@@ -12,6 +14,8 @@ import com.nikitalipatov.common.feign.CarClient;
 import com.nikitalipatov.common.feign.HouseClient;
 import com.nikitalipatov.common.feign.PassportClient;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,6 +34,8 @@ public class CitizenServiceImpl implements CitizenService {
     private final HouseClient houseClient;
     private final CarClient carClient;
 
+    private final KafkaTemplate<String, PersonCreationDto> kafkaTemplate;
+
     @Override
       public List<PersonDtoResponse> getAll() {
         var persons = personRepository.findAll();
@@ -40,13 +46,6 @@ public class CitizenServiceImpl implements CitizenService {
             PassportDtoResponse passport = passportDtoResponses.get(person.getId());
             personDtoResponses.add(converter.toDto(person, passport));
         });
-
-//        PersonDtoResponse person;
-//        for (int i = 0; i < persons.size(); i++) {
-//            var a = passportDtoResponses.get(i);
-//            person = converter.toDto(persons.get(i), Objects.requireNonNull(passportDtoResponses).get(i));
-//            personDtoResponses.add(person);
-//        }
         return personDtoResponses;
     }
 
@@ -58,7 +57,9 @@ public class CitizenServiceImpl implements CitizenService {
     @Override
        public PersonDtoResponse create(PersonDtoRequest personDtoRequest) {
         Citizen person = personRepository.save(converter.toEntity(personDtoRequest));
-        var passport = passportClient.create(person.getId());
+        kafkaTemplate.send("baeldung", new PersonCreationDto("Success", person.getId()));
+        //var passport = passportClient.create(tDto);
+        var passport = passportClient.getPassportByPersonId(person.getId());
         return converter.toDto(person, Objects.requireNonNull(passport));
     }
 
