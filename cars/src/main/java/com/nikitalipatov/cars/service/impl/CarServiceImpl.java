@@ -6,8 +6,10 @@ import com.nikitalipatov.cars.service.CarService;
 import com.nikitalipatov.cars.converter.CarConverter;
 import com.nikitalipatov.common.dto.response.CarDtoResponse;
 import com.nikitalipatov.common.dto.request.CarDtoRequest;
+import com.nikitalipatov.common.dto.response.DeletePersonDto;
 import com.nikitalipatov.common.error.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +21,7 @@ public class CarServiceImpl implements CarService {
 
     private final CarRepository carRepository;
     private final CarConverter carConverter;
+    private final KafkaTemplate<String, DeletePersonDto> kafkaTemplate;
 
     @Override
     public List<CarDtoResponse> getAll() {
@@ -34,8 +37,37 @@ public class CarServiceImpl implements CarService {
         return carConverter.toDto(carRepository.findAllByOwnerId(personId));
     }
 
+    @Override
+    public void rollback(int personId, List<CarDtoResponse> carList) {
+        carList.forEach(car -> carRepository.save(
+                Car.builder()
+                        .ownerId(personId)
+                        .color(car.getColor())
+                        .gosNumber(car.getGosNumber())
+                        .model(car.getModel())
+                        .name(car.getName())
+                        .price(car.getPrice())
+                        .build()
+        ));
+    }
+
     public void deletePersonCars(int personId) {
-        carRepository.deleteAllByOwnerId(personId);
+        try {
+           var carList = getCitizenCar(personId);
+            carRepository.deleteAllByOwnerId(personId);
+            kafkaTemplate.send("",
+                    DeletePersonDto.builder()
+                            .carDeleteStatus("ok")
+                            .carList(carList)
+                            .build()
+            );
+        } catch (Exception e) {
+            kafkaTemplate.send("",
+                    DeletePersonDto.builder()
+                            .carDeleteStatus("not ok")
+                            .build()
+            );
+        }
     }
 
     @Override

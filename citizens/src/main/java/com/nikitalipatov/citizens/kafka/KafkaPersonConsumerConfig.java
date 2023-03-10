@@ -1,9 +1,8 @@
 package com.nikitalipatov.citizens.kafka;
 
-import com.nikitalipatov.common.dto.kafka.PersonCreationDto;
+import com.nikitalipatov.common.dto.response.PersonCreationDto;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
-import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.EnableKafka;
@@ -18,7 +17,7 @@ import java.util.Map;
 
 @EnableKafka
 @Configuration
-public class KafkaConsumerConfig {
+public class KafkaPersonConsumerConfig {
 
     @Bean
     public ConsumerFactory<String, PersonCreationDto> consumerFactory() {
@@ -44,7 +43,7 @@ public class KafkaConsumerConfig {
 
     @Bean
     public ConcurrentKafkaListenerContainerFactory<String, PersonCreationDto>
-    kafkaListenerContainerFactory() {
+    kafkaPersonListenerContainerFactory() {
 
         ConcurrentKafkaListenerContainerFactory<String, PersonCreationDto> factory =
                 new ConcurrentKafkaListenerContainerFactory<>();

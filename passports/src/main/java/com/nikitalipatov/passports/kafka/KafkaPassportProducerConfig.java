@@ -1,6 +1,6 @@
-package com.nikitalipatov.citizens.kafka;
+package com.nikitalipatov.passports.kafka;
 
-import com.nikitalipatov.common.dto.kafka.PersonCreationDto;
+import com.nikitalipatov.common.dto.response.PersonCreationDto;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.context.annotation.Bean;
@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Configuration
-public class KafkaProducerConfig {
+public class KafkaPassportProducerConfig {
 
     @Bean
     public ProducerFactory<String, PersonCreationDto> producerFactory() {
@@ -36,4 +36,5 @@ public class KafkaProducerConfig {
     public KafkaTemplate<String, PersonCreationDto> kafkaTemplate() {
         return new KafkaTemplate<>(producerFactory());
     }
+
 }

@@ -1,4 +1,4 @@
-package com.nikitalipatov.common.dto.kafka;
+package com.nikitalipatov.common.dto.response;
 
 import lombok.*;
 

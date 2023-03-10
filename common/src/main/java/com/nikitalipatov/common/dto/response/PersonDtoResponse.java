@@ -10,6 +10,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PersonDtoResponse {
+    private int personId;
     private String name;
     private int age;
     private String sex;

@@ -1,4 +1,4 @@
-package com.nikitalipatov.citizens.kafka;
+package com.nikitalipatov.common.kafka;
 
 import org.apache.kafka.clients.admin.AdminClientConfig;
 import org.apache.kafka.clients.admin.NewTopic;
@@ -24,7 +24,13 @@ public class KafkaTopicConfig {
     }
 
     @Bean
-    public NewTopic topic1() {
-        return new NewTopic("baeldung", 1, (short) 1);
+    public NewTopic personEvents() {
+        return new NewTopic("personEvents", 1, (short) 1);
     }
+
+    @Bean
+    public NewTopic passportEvents() {
+        return new NewTopic("passportEvents", 1, (short) 1);
+    }
+
 }

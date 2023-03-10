@@ -12,6 +12,8 @@ public interface PassportService {
 
     void delete(int personId);
 
+    void rollback(PassportDtoResponse passportDtoResponse);
+
     PassportDtoResponse getByOwnerId(int personId);
 
     List<PassportDtoResponse> getAllByOwnerIds(List<Integer> ownerIds);

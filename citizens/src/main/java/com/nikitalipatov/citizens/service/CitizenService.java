@@ -16,6 +16,8 @@ public interface CitizenService {
 
     void delete(int id);
 
+    void rollbackCitizenCreation(int personId);
+
     PersonDtoResponse edit(int id, PersonDtoRequest personDtoRequest);
 
     Citizen getPerson(int personId);

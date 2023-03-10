@@ -3,6 +3,7 @@ package com.nikitalipatov.citizens.controller;
 import com.nikitalipatov.citizens.service.CitizenService;
 import com.nikitalipatov.common.dto.request.PersonDtoRequest;
 import com.nikitalipatov.common.dto.response.PersonDtoResponse;
+import com.nikitalipatov.common.feign.CitizenClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -12,10 +13,14 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(value = "/api/person")
-public class CitizenController {
+public class CitizenController implements CitizenClient {
 
     private final CitizenService personService;
 
+    @Override
+    public void rollbackCitizenCreation(int personId) {
+        personService.rollbackCitizenCreation(personId);
+    }
 
     @GetMapping(value = "/list")
     @ResponseStatus(value = HttpStatus.ACCEPTED)
