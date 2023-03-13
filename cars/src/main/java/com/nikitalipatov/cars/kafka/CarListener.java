@@ -13,20 +13,18 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-@KafkaListener(topics = "carEvents", groupId = "test-gi", containerFactory = "kafkaPersonListenerContainerFactory")
+@KafkaListener(topics = "carEvents", groupId = "test-gi", containerFactory = "kafkaCarListenerContainerFactory")
 public class CarListener {
 
-    private final CarService carService;
-    private final PassportClient passportClient;
-    private final HouseClient houseClient;
+//    private final CarService carService;
+//    private final PassportClient passportClient;
+//    private final HouseClient houseClient;
 
     @KafkaHandler
-    public void handlePassportDelete(DeletePersonDto deletePersonDto) {
-        if (deletePersonDto.getCarDeleteStatus().equals("not ok")) {
-            passportClient.rollback(deletePersonDto.getPassport());
-            carService.rollback(deletePersonDto.getPerson().getPersonId(), deletePersonDto.getCarList());
-        } else {
-            houseClient.removePerson(deletePersonDto.getPerson().getPersonId());
-        }
+    public DeletePersonDto handleCarDelete(DeletePersonDto deletePersonDto) {
+        return DeletePersonDto.builder()
+                .carDeleteStatus(deletePersonDto.getCarDeleteStatus())
+                .carList(deletePersonDto.getCarList())
+                .build();
     }
 }

@@ -21,6 +21,11 @@ public class HouseController implements HouseClient {
     private final HouseService houseService;
 
     @Override
+    public void rollback(int personId, List<HouseDtoResponse> houseDtoResponseList) {
+        houseService.rollback(personId, houseDtoResponseList);
+    }
+
+    @Override
     public List<HouseDtoResponse> getAll() {
         return houseService.getAll();
     }

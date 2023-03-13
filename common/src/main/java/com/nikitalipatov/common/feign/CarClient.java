@@ -11,6 +11,9 @@ import java.util.List;
 @FeignClient(value = "CarClient", url = "http://localhost:8080/api/car")
 public interface CarClient {
 
+    @RequestMapping(method = RequestMethod.POST, value = "/rollback/{personId}")
+    void rollback(@PathVariable int personId, @RequestBody List<CarDtoResponse> carDtoResponse);
+
     @RequestMapping(method = RequestMethod.DELETE, value = "/delete/person/{personId}")
     void deletePersonCars(@PathVariable int personId);
 

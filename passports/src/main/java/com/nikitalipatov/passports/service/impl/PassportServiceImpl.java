@@ -1,5 +1,6 @@
 package com.nikitalipatov.passports.service.impl;
 
+import com.nikitalipatov.common.dto.response.DeletePersonDto;
 import com.nikitalipatov.common.dto.response.PersonCreationDto;
 import com.nikitalipatov.common.dto.response.PassportDtoResponse;
 import com.nikitalipatov.common.error.ResourceNotFoundException;
@@ -21,7 +22,7 @@ public class PassportServiceImpl implements PassportService {
 
     private final PassportRepository passportRepository;
     private final PassportConverter passportConverter;
-    private final KafkaTemplate<String, PersonCreationDto> kafkaTemplate;
+    private final KafkaTemplate<String, Object> kafkaTemplate;
 
     @Override
     public void rollback(PassportDtoResponse passportDtoResponse) {
@@ -55,10 +56,14 @@ public class PassportServiceImpl implements PassportService {
     @Override
     public void delete(int personId) {
         try {
+            Passport passport = getPassport(personId);
             passportRepository.deleteByOwnerId(personId);
-            kafkaTemplate.send()
+            kafkaTemplate.send("passportEvents", DeletePersonDto.builder()
+                    .passportDeleteStatus("ok")
+                    .passport(passportConverter.toDto(passport)));
         } catch (Exception e) {
-
+            kafkaTemplate.send("passportEvents", DeletePersonDto.builder()
+                    .passportDeleteStatus("not ok"));
         }
     }
 

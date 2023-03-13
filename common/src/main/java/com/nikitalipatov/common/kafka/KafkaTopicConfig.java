@@ -33,4 +33,14 @@ public class KafkaTopicConfig {
         return new NewTopic("passportEvents", 1, (short) 1);
     }
 
+    @Bean
+    public NewTopic carEvents() {
+        return new NewTopic("carEvents", 1, (short) 1);
+    }
+
+    @Bean
+    public NewTopic houseEvents() {
+        return new NewTopic("houseEvents", 1, (short) 1);
+    }
+
 }

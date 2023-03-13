@@ -21,6 +21,7 @@ public class PersonConverter {
                 .age(person.getAge())
                 .passportNumber(passportDtoResponse.getNumber())
                 .passportSerial(passportDtoResponse.getSerial())
+                .personId(person.getId())
                 .build();
     }
 
@@ -29,6 +30,7 @@ public class PersonConverter {
                 .name(person.getFullName())
                 .sex(person.getSex())
                 .age(person.getAge())
+                .personId(person.getId())
                 .build();
     }
 

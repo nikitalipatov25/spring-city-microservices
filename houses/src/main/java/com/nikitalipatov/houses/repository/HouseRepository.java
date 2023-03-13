@@ -8,6 +8,6 @@ import java.util.List;
 
 public interface HouseRepository extends JpaRepository<House, Integer> {
 
-    @Query(value = "GET * FROM house JOIN house_person ON house.id = house_person.house_id WHERE house_person.owner_id =?1", nativeQuery = true)
-    List<House> getAllHousesByOwnerId(int personId);
+    @Query(value = "SELECT house.id, house.street, house.number FROM house JOIN house_person ON house.id = house_person.house_id WHERE house_person.owner_id = ?1", nativeQuery = true)
+    List<House> getHousesByOwnerId(int personId);
 }

@@ -1,6 +1,7 @@
 package com.nikitalipatov.common.dto.response;
 
 import lombok.*;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
@@ -9,6 +10,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Component
 public class DeletePersonDto {
     private PersonDtoResponse person;
     private PassportDtoResponse passport;
@@ -17,12 +19,4 @@ public class DeletePersonDto {
     private String carDeleteStatus;
     private List<HouseDtoResponse> houseLst;
     private String houseDeleteStatus;
-
-    public DeletePersonDto(PersonDtoResponse person) {
-        this.person = person;
-    }
-
-    public DeletePersonDto(List<CarDtoResponse> carList) {
-        this.carList = carList;
-    }
 }

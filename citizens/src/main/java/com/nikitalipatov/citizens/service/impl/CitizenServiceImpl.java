@@ -14,6 +14,7 @@ import com.nikitalipatov.common.feign.CarClient;
 import com.nikitalipatov.common.feign.HouseClient;
 import com.nikitalipatov.common.feign.PassportClient;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
@@ -31,7 +32,18 @@ public class CitizenServiceImpl implements CitizenService {
     private final HouseClient houseClient;
     private final CarClient carClient;
 
-    private final KafkaTemplate<String, PersonCreationDto> kafkaTemplate;
+    //private final KafkaProperties kafkaProperties;
+
+    private final KafkaTemplate<String, Object> kafkaTemplate;
+    //private final KafkaTemplate<String, DeletePersonDto> kafkaTemplateDelete;
+
+    public void rollback(PersonDtoResponse personDtoResponse) {
+        personRepository.save(Citizen.builder()
+                        .fullName(personDtoResponse.getName())
+                        .age(personDtoResponse.getAge())
+                        .sex(personDtoResponse.getSex())
+                .build());
+    }
 
     @Override
     public void rollbackCitizenCreation(int personId) {
@@ -71,13 +83,14 @@ public class CitizenServiceImpl implements CitizenService {
         //  у нас не ломалась логика
 
         Citizen person = getPerson(personId);
-        DeletePersonDto deletePerson = new DeletePersonDto(converter.toDto(person));
+
+        var res = DeletePersonDto.builder()
+                .person(converter.toDto(person))
+                .build();
 
         personRepository.deleteById(personId);
-//        passportClient.delete(personId);
-//        carClient.deletePersonCars(personId);
-//        houseClient.removePerson(personId);
-        kafkaTemplate.send("personEvents", deletePerson);
+
+        kafkaTemplate.send("personEvents", res);
     }
 
     @Override

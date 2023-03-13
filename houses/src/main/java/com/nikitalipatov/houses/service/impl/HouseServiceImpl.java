@@ -15,7 +15,6 @@ import com.nikitalipatov.houses.service.HouseService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -27,6 +26,10 @@ public class HouseServiceImpl implements HouseService {
     private final HouseConverter houseConverter;
     private final HousePersonRepository housePersonRepository;
     private final KafkaTemplate<String, DeletePersonDto> kafkaTemplate;
+
+    public void rollback(int personId, List<HouseDtoResponse> houseDtoResponseList) {
+        houseDtoResponseList.forEach(house -> addCitizen(house.getHouseId(), personId));
+    }
 
     @Override
     public List<HouseDtoResponse> getAll() {
@@ -45,15 +48,16 @@ public class HouseServiceImpl implements HouseService {
 
     public void removePerson(int personId) {
         try {
-            housePersonRepository.deleteAllByHousePersonId(personId);
-            kafkaTemplate.send("",
+            var personsHouses = getPersonHouses(personId);
+            housePersonRepository.deleteByOwnerId(personId);
+            kafkaTemplate.send("houseEvents",
                     DeletePersonDto.builder()
                             .houseDeleteStatus("ok")
-                            .houseLst(houseConverter.toDto(houseRepository.getAllHousesByOwnerId(personId)))
+                            .houseLst(houseConverter.toDto(personsHouses))
                     .build()
             );
         } catch (Exception e) {
-            kafkaTemplate.send("",
+            kafkaTemplate.send("houseEvents",
                     DeletePersonDto.builder()
                             .houseDeleteStatus("not ok")
                     .build()
@@ -77,5 +81,9 @@ public class HouseServiceImpl implements HouseService {
         return houseRepository.findById(houseId).orElseThrow(
                 () -> new ResourceNotFoundException("No such house with id " + houseId)
         );
+    }
+
+    public List<House> getPersonHouses(int ownerId) {
+        return houseRepository.getHousesByOwnerId(ownerId);
     }
 }

@@ -9,6 +9,8 @@ import java.util.List;
 
 public interface HouseService {
 
+    void rollback(int personId, List<HouseDtoResponse> houseDtoResponseList);
+
     List<HouseDtoResponse> getAll();
 
     HouseDtoResponse create(HouseDtoRequest houseDtoRequest);

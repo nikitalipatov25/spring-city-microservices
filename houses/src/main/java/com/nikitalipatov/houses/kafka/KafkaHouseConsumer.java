@@ -1,10 +1,8 @@
-package com.nikitalipatov.passports.kafka;
+package com.nikitalipatov.houses.kafka;
 
-import com.nikitalipatov.common.dto.response.PersonCreationDto;
-import lombok.RequiredArgsConstructor;
+import com.nikitalipatov.common.dto.response.DeletePersonDto;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
-import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.EnableKafka;
@@ -19,15 +17,10 @@ import java.util.Map;
 
 @EnableKafka
 @Configuration
-@RequiredArgsConstructor
-public class KafkaPassportConsumerConfig {
-
-    private final KafkaProperties kafkaProperties;
+public class KafkaHouseConsumer {
 
     @Bean
-    public ConsumerFactory<String, Object> consumerFactory() {
-        final JsonDeserializer<Object> jsonDeserializer = new JsonDeserializer<>();
-        jsonDeserializer.addTrustedPackages("*");
+    public ConsumerFactory<String, DeletePersonDto> consumerFactory() {
         Map<String, Object> props = new HashMap<>();
         props.put(
                 ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,
@@ -35,17 +28,26 @@ public class KafkaPassportConsumerConfig {
         props.put(
                 ConsumerConfig.GROUP_ID_CONFIG,
                 "test-gi");
+        props.put(
+                ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
+                StringDeserializer.class);
+        props.put(
+                ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
+                JsonDeserializer.class); //!
+        props.put(JsonSerializer.ADD_TYPE_INFO_HEADERS, false);
         return new DefaultKafkaConsumerFactory<>(
-                props, new StringDeserializer(), jsonDeserializer
-        );
+                props,
+                new StringDeserializer(),
+                new JsonDeserializer<>(DeletePersonDto.class));
     }
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, Object> kafkaListenerContainerFactory() {
-        ConcurrentKafkaListenerContainerFactory<String, Object> factory =
+    public ConcurrentKafkaListenerContainerFactory<String, DeletePersonDto>
+    kafkaHouseListenerContainerFactory() {
+
+        ConcurrentKafkaListenerContainerFactory<String, DeletePersonDto> factory =
                 new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory());
-
         return factory;
     }
 

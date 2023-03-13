@@ -14,6 +14,9 @@ import java.util.List;
 @FeignClient(value = "HouseClient", url = "http://localhost:8080/api/house")
 public interface HouseClient {
 
+    @RequestMapping(method = RequestMethod.POST, value = "/rollback/{personId}")
+    void rollback(@PathVariable int personId, @RequestBody List<HouseDtoResponse> houseDtoResponseList);
+
     @RequestMapping(method = RequestMethod.DELETE, value = "/delete/{personId}")
     void removePerson(@PathVariable int personId);
 

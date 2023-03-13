@@ -16,23 +16,19 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-@KafkaListener(topics = "houseEvents", groupId = "test-gi", containerFactory = "kafkaPersonListenerContainerFactory")
+@KafkaListener(topics = "houseEvents", groupId = "test-gi", containerFactory = "kafkaHouseListenerContainerFactory")
 public class HouseListener {
 
-    private final HouseService houseService;
-    private final PassportClient passportClient;
-    private final CarClient carClient;
-    private final CitizenClient personClient;
-    private final KafkaTemplate<String, DeletePersonDto> kafkaTemplate;
+//    private final HouseService houseService;
+//    private final PassportClient passportClient;
+//    private final CarClient carClient;
+//    private final KafkaTemplate<String, DeletePersonDto> kafkaTemplate;
 
     @KafkaHandler
-    public void handleHouseDelete(DeletePersonDto deletePersonDto) {
-        if (deletePersonDto.getHouseDeleteStatus().equals("not ok")) {
-            passportClient.rollback(deletePersonDto.getPassport());
-            carClient.rollback(deletePersonDto.getPerson().getPersonId(), deletePersonDto.getCarList());
-            houseService.rollback();
-        } else {
-            kafkaTemplate.send("personEvent", deletePersonDto);
-        }
+    public DeletePersonDto handleHouseDelete(DeletePersonDto deletePersonDto) {
+        return DeletePersonDto.builder()
+                .houseDeleteStatus(deletePersonDto.getHouseDeleteStatus())
+                .houseLst(deletePersonDto.getHouseLst())
+                .build();
     }
 }
