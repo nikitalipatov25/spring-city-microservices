@@ -47,22 +47,8 @@ public class HouseServiceImpl implements HouseService {
     }
 
     public void removePerson(int personId) {
-        try {
-            var personsHouses = getPersonHouses(personId);
-            housePersonRepository.deleteByOwnerId(personId);
-            kafkaTemplate.send("houseEvents",
-                    DeletePersonDto.builder()
-                            .houseDeleteStatus("ok")
-                            .houseLst(houseConverter.toDto(personsHouses))
-                    .build()
-            );
-        } catch (Exception e) {
-            kafkaTemplate.send("houseEvents",
-                    DeletePersonDto.builder()
-                            .houseDeleteStatus("not ok")
-                    .build()
-            );
-        }
+
+        housePersonRepository.deleteByOwnerId(personId);
     }
 
     @Override
@@ -83,7 +69,8 @@ public class HouseServiceImpl implements HouseService {
         );
     }
 
-    public List<House> getPersonHouses(int ownerId) {
-        return houseRepository.getHousesByOwnerId(ownerId);
+    @Override
+    public List<HouseDtoResponse> getPersonHouses(int ownerId) {
+        return houseConverter.toDto(houseRepository.getHousesByOwnerId(ownerId));
     }
 }

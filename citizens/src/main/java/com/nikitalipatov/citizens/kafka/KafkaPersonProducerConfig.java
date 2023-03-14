@@ -22,26 +22,7 @@ public class KafkaPersonProducerConfig {
 
     private final KafkaProperties kafkaProperties;
 
-//    @Bean
-//    public ProducerFactory<String, DeletePersonDto> producerFactory() {
-//        Map<String, Object> configProps = new HashMap<>();
-//        configProps.put(
-//                ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,
-//                "localhost:29092");
-//        configProps.put(
-//                ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
-//                StringSerializer.class);
-//        configProps.put(
-//                ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
-//                JsonSerializer.class);
-//
-//        return new DefaultKafkaProducerFactory<>(configProps);
-//    }
-//
-//    @Bean
-//    public KafkaTemplate<String, DeletePersonDto> kafkaTemplate() {
-//        return new KafkaTemplate<>(producerFactory());
-//    }
+
 
 
     @Bean
@@ -56,18 +37,6 @@ public class KafkaPersonProducerConfig {
         props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:29092");
         return props;
 
-//        Map<String, Object> configProps = new HashMap<>();
-//        configProps.put(
-//                ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,
-//                "localhost:29092");
-//        configProps.put(
-//                ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
-//                StringSerializer.class);
-//        configProps.put(
-//                ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
-//                JsonSerializer.class);
-//
-//        return new DefaultKafkaProducerFactory<>(configProps);
     }
 
     @Bean

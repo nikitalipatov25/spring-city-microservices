@@ -4,11 +4,9 @@ import com.nikitalipatov.citizens.converter.PersonConverter;
 import com.nikitalipatov.citizens.model.Citizen;
 import com.nikitalipatov.citizens.repository.CitizenRepository;
 import com.nikitalipatov.citizens.service.CitizenService;
-import com.nikitalipatov.common.dto.response.DeletePersonDto;
-import com.nikitalipatov.common.dto.response.PersonCreationDto;
+import com.nikitalipatov.common.dto.request.DeleteStatus;
+import com.nikitalipatov.common.dto.response.*;
 import com.nikitalipatov.common.dto.request.PersonDtoRequest;
-import com.nikitalipatov.common.dto.response.PassportDtoResponse;
-import com.nikitalipatov.common.dto.response.PersonDtoResponse;
 import com.nikitalipatov.common.error.ResourceNotFoundException;
 import com.nikitalipatov.common.feign.CarClient;
 import com.nikitalipatov.common.feign.HouseClient;
@@ -29,13 +27,7 @@ public class CitizenServiceImpl implements CitizenService {
     private final CitizenRepository personRepository;
     private final PersonConverter converter;
     private final PassportClient passportClient;
-    private final HouseClient houseClient;
-    private final CarClient carClient;
-
-    //private final KafkaProperties kafkaProperties;
-
     private final KafkaTemplate<String, Object> kafkaTemplate;
-    //private final KafkaTemplate<String, DeletePersonDto> kafkaTemplateDelete;
 
     public void rollback(PersonDtoResponse personDtoResponse) {
         personRepository.save(Citizen.builder()
@@ -71,26 +63,25 @@ public class CitizenServiceImpl implements CitizenService {
     @Override
     public PersonDtoResponse create(PersonDtoRequest personDtoRequest) {
         Citizen person = personRepository.save(converter.toEntity(personDtoRequest));
-        kafkaTemplate.send("personEvents", new PersonCreationDto("ok", person.getId()));
+        kafkaTemplate.send("personEvents", new PersonCreationDto(DeleteStatus.SUCCESS, person.getId()));
         return converter.toDto(person);
     }
 
     @Override
     public void delete(int personId) {
-        // todo Если например в сервисе домов что то пойдет не так и вернется ошибка, то транзакция тебя тут не спасет и отката в сервисе
-        //  домов и паспортов не произойдет, в результате ты получишь не консистентные данные, что обычно весьма критично для бизнеса.
-        //  Вообще этот метод самый сложный во всем проекте, нужно подумать как сделать так, что бы если какой то из сервисов недоступен
-        //  у нас не ломалась логика
-
         Citizen person = getPerson(personId);
-
-        var res = DeletePersonDto.builder()
+        var result = PersonDeleteDto.builder()
                 .person(converter.toDto(person))
                 .build();
-
-        personRepository.deleteById(personId);
-
-        kafkaTemplate.send("personEvents", res);
+        try {
+            personRepository.deleteById(personId);
+            result.setPersonDeleteStatus(DeleteStatus.SUCCESS);
+            kafkaTemplate.send("personEvents", result);
+        } catch (Exception e) {
+            personRepository.deleteById(personId);
+            result.setPersonDeleteStatus(DeleteStatus.FAIL);
+            kafkaTemplate.send("personEvents", result);
+        }
     }
 
     @Override

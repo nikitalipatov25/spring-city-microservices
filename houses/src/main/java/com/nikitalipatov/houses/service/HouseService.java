@@ -21,6 +21,8 @@ public interface HouseService {
 
     House getHouse(int houseId);
 
+    List<HouseDtoResponse> getPersonHouses(int ownerId);
+
     void removePerson(int personId);
 
     HousePersonDto addCitizen(int houseId, int personId);

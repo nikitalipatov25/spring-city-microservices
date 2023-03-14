@@ -1,8 +1,10 @@
 package com.nikitalipatov.citizens.kafka;
 
 import com.nikitalipatov.citizens.service.CitizenService;
+import com.nikitalipatov.common.dto.request.DeleteStatus;
 import com.nikitalipatov.common.dto.response.DeletePersonDto;
 import com.nikitalipatov.common.dto.response.PersonCreationDto;
+import com.nikitalipatov.common.dto.response.PersonDeleteDto;
 import com.nikitalipatov.common.feign.CarClient;
 import com.nikitalipatov.common.feign.HouseClient;
 import com.nikitalipatov.common.feign.PassportClient;
@@ -23,36 +25,46 @@ public class PersonListener {
     private final CarClient carClient;
     private final HouseClient houseClient;
     private final CitizenService personService;
+    private final KafkaTemplate<String, Object> kafkaTemplate;
 
     @KafkaHandler
     public void handlePersonCreation(PersonCreationDto personCreationDto) {
-        if (personCreationDto.getStatus().equals("ok")) {
+        if (personCreationDto.getStatus().equals(DeleteStatus.SUCCESS)) {
             passportClient.create(personCreationDto.getPersonId());
         }
     }
 
     @KafkaHandler
+    public void listenToPersonDelete(PersonDeleteDto personDeleteDto) {
+        DeletePersonDto personDelete = DeletePersonDto.builder()
+                .person(personDeleteDto.getPerson())
+                .personDeleteStatus(personDeleteDto.getPersonDeleteStatus())
+                .build();
+        kafkaTemplate.send("passportEvents", personDelete);
+    }
+
+    @KafkaHandler
     public void handlePersonDelete(DeletePersonDto deletePerson) {
 
-        passportClient.delete(deletePerson.getPerson().getPersonId());
-        carClient.deletePersonCars(deletePerson.getPerson().getPersonId());
-        houseClient.removePerson(deletePerson.getPerson().getPersonId());
+        if (deletePerson.getPersonDeleteStatus().equals(DeleteStatus.FAIL)) {
+            personService.rollback(deletePerson.getPerson());
+        }
 
-        if (deletePerson.getPassportDeleteStatus().equals("not ok") &&
-                deletePerson.getCarDeleteStatus().equals("not ok") &&
-                deletePerson.getHouseDeleteStatus().equals("not ok")) {
+        if (deletePerson.getPersonDeleteStatus().equals(DeleteStatus.FAIL)) {
             passportClient.rollback(deletePerson.getPassport());
-            carClient.rollback(deletePerson.getPerson().getPersonId(), deletePerson.getCarList());
-            houseClient.rollback(deletePerson.getPerson().getPersonId(), deletePerson.getHouseLst());
             personService.rollback(deletePerson.getPerson());
         }
-        if (deletePerson.getCarDeleteStatus().equals("not ok") && deletePerson.getHouseDeleteStatus().equals("not ok")) {
+
+        if (deletePerson.getCarDeleteStatus().equals(DeleteStatus.FAIL)) {
             carClient.rollback(deletePerson.getPerson().getPersonId(), deletePerson.getCarList());
-            houseClient.rollback(deletePerson.getPerson().getPersonId(), deletePerson.getHouseLst());
+            passportClient.rollback(deletePerson.getPassport());
             personService.rollback(deletePerson.getPerson());
         }
-        if (deletePerson.getHouseDeleteStatus().equals("not ok")) {
+
+        if (deletePerson.getHouseDeleteStatus().equals(DeleteStatus.FAIL)) {
             houseClient.rollback(deletePerson.getPerson().getPersonId(), deletePerson.getHouseLst());
+            carClient.rollback(deletePerson.getPerson().getPersonId(), deletePerson.getCarList());
+            passportClient.rollback(deletePerson.getPassport());
             personService.rollback(deletePerson.getPerson());
         }
     }

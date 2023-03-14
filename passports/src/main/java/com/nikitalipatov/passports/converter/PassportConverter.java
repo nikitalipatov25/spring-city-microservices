@@ -16,7 +16,6 @@ public class PassportConverter {
         return PassportDtoResponse.builder()
                 .number(passport.getNumber())
                 .serial(passport.getSerial())
-                .status("Not Success") //!!!
                 .build();
     }
 

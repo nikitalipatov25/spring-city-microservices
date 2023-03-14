@@ -1,5 +1,6 @@
 package com.nikitalipatov.passports.service.impl;
 
+import com.nikitalipatov.common.dto.request.DeleteStatus;
 import com.nikitalipatov.common.dto.response.DeletePersonDto;
 import com.nikitalipatov.common.dto.response.PersonCreationDto;
 import com.nikitalipatov.common.dto.response.PassportDtoResponse;
@@ -12,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -38,9 +40,9 @@ public class PassportServiceImpl implements PassportService {
         Passport passport = new Passport();
         try {
             passport = passportRepository.save(passportConverter.toEntity(personId));
-            kafkaTemplate.send("passportEvents", new PersonCreationDto("ok", passport.getOwnerId()));
+            kafkaTemplate.send("passportEvents", new PersonCreationDto(DeleteStatus.SUCCESS, passport.getOwnerId()));
         } catch (Exception e) {
-            kafkaTemplate.send("passportEvents", new PersonCreationDto("not ok", personId));
+            kafkaTemplate.send("passportEvents", new PersonCreationDto(DeleteStatus.FAIL, personId));
         }
         return passportConverter.toDto(passport);
     }
@@ -55,16 +57,9 @@ public class PassportServiceImpl implements PassportService {
 
     @Override
     public void delete(int personId) {
-        try {
-            Passport passport = getPassport(personId);
-            passportRepository.deleteByOwnerId(personId);
-            kafkaTemplate.send("passportEvents", DeletePersonDto.builder()
-                    .passportDeleteStatus("ok")
-                    .passport(passportConverter.toDto(passport)));
-        } catch (Exception e) {
-            kafkaTemplate.send("passportEvents", DeletePersonDto.builder()
-                    .passportDeleteStatus("not ok"));
-        }
+
+        passportRepository.deleteByOwnerId(personId);
+
     }
 
     public Passport getPassport(int personId) {

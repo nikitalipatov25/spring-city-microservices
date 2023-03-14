@@ -52,22 +52,9 @@ public class CarServiceImpl implements CarService {
     }
 
     public void deletePersonCars(int personId) {
-        try {
-           var carList = getCitizenCar(personId);
-            carRepository.deleteAllByOwnerId(personId);
-            kafkaTemplate.send("carEvents",
-                    DeletePersonDto.builder()
-                            .carDeleteStatus("ok")
-                            .carList(carList)
-                            .build()
-            );
-        } catch (Exception e) {
-            kafkaTemplate.send("carEvents",
-                    DeletePersonDto.builder()
-                            .carDeleteStatus("not ok")
-                            .build()
-            );
-        }
+
+        carRepository.deleteAllByOwnerId(personId);
+
     }
 
     @Override

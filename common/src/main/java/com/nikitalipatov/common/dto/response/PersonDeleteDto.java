@@ -5,9 +5,10 @@ import lombok.*;
 
 @Getter
 @Setter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class PersonCreationDto {
-    private Enum<DeleteStatus> status;
-    private int personId;
+public class PersonDeleteDto {
+    private PersonDtoResponse person;
+    private Enum<DeleteStatus> personDeleteStatus;
 }
