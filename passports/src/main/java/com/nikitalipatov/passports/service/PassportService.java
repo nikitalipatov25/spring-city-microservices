@@ -12,7 +12,9 @@ public interface PassportService {
 
     void delete(int personId);
 
-    void rollback(PassportDtoResponse passportDtoResponse);
+//    void rollbackDeletedPassport(PassportDtoResponse passportDtoResponse);
+
+    void rollbackDeletedPassport(int ownerId);
 
     PassportDtoResponse getByOwnerId(int personId);
 

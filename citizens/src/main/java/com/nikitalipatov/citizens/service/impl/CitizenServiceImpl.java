@@ -4,14 +4,17 @@ import com.nikitalipatov.citizens.converter.PersonConverter;
 import com.nikitalipatov.citizens.model.Citizen;
 import com.nikitalipatov.citizens.repository.CitizenRepository;
 import com.nikitalipatov.citizens.service.CitizenService;
-import com.nikitalipatov.common.dto.request.KafkaStatus;
+import com.nikitalipatov.common.dto.kafka.CitizenCreateDto;
+import com.nikitalipatov.common.enums.KafkaStatus;
 import com.nikitalipatov.common.dto.response.*;
 import com.nikitalipatov.common.dto.request.PersonDtoRequest;
+import com.nikitalipatov.common.enums.ModelStatus;
 import com.nikitalipatov.common.error.ResourceNotFoundException;
 import com.nikitalipatov.common.feign.PassportClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,12 +29,18 @@ public class CitizenServiceImpl implements CitizenService {
     private final PassportClient passportClient;
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
-    public void rollback(PersonDtoResponse personDtoResponse) {
-        personRepository.save(Citizen.builder()
-                        .fullName(personDtoResponse.getName())
-                        .age(personDtoResponse.getAge())
-                        .sex(personDtoResponse.getSex())
-                .build());
+//    public void rollbackDeletedCitizen(PersonDtoResponse personDtoResponse) {
+//        personRepository.save(Citizen.builder()
+//                        .fullName(personDtoResponse.getName())
+//                        .age(personDtoResponse.getAge())
+//                        .sex(personDtoResponse.getSex())
+//                .build());
+//    }
+
+    public void rollbackDeletedCitizen(int citizenId) {
+        Citizen citizen = getPerson(citizenId);
+        citizen.setStatus(ModelStatus.ACTIVE);
+        personRepository.save(citizen);
     }
 
     @Override
@@ -58,9 +67,12 @@ public class CitizenServiceImpl implements CitizenService {
     }
 
     @Override
+    @Transactional
     public PersonDtoResponse create(PersonDtoRequest personDtoRequest) {
         Citizen person = personRepository.save(converter.toEntity(personDtoRequest));
-        kafkaTemplate.send("personEvents", new PersonCreationDto(KafkaStatus.SUCCESS, person.getId()));
+        kafkaTemplate.send("personSender", CitizenCreateDto.builder()
+                .citizenId(person.getId())
+                .citizenCreateStatus(KafkaStatus.SUCCESS));
         return converter.toDto(person);
     }
 

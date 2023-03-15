@@ -1,7 +1,5 @@
-package com.nikitalipatov.citizens.kafka;
+package com.nikitalipatov.citizens.config;
 
-import com.nikitalipatov.common.dto.response.DeletePersonDto;
-import com.nikitalipatov.common.dto.response.PersonCreationDto;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -12,12 +10,7 @@ import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
-import org.springframework.kafka.support.converter.RecordMessageConverter;
-import org.springframework.kafka.support.converter.StringJsonMessageConverter;
-import org.springframework.kafka.support.mapping.DefaultJackson2JavaTypeMapper;
-import org.springframework.kafka.support.mapping.Jackson2JavaTypeMapper;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
-import org.springframework.kafka.support.serializer.JsonSerializer;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,7 +18,7 @@ import java.util.Map;
 @EnableKafka
 @Configuration
 @RequiredArgsConstructor
-public class KafkaPersonConsumerConfig {
+public class KafkaConsumerConfig {
 
     private final KafkaProperties kafkaProperties;
 

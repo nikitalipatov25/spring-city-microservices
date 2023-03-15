@@ -25,9 +25,8 @@ public class HouseServiceImpl implements HouseService {
     private final HouseRepository houseRepository;
     private final HouseConverter houseConverter;
     private final HousePersonRepository housePersonRepository;
-    private final KafkaTemplate<String, DeletePersonDto> kafkaTemplate;
 
-    public void rollback(int personId, List<HouseDtoResponse> houseDtoResponseList) {
+    public void rollbackDeletedCitizenFromHouses(int personId, List<HouseDtoResponse> houseDtoResponseList) {
         houseDtoResponseList.forEach(house -> addCitizen(house.getHouseId(), personId));
     }
 

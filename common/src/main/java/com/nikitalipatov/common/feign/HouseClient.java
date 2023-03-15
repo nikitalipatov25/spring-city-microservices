@@ -15,7 +15,7 @@ import java.util.List;
 public interface HouseClient {
 
     @RequestMapping(method = RequestMethod.POST, value = "/rollback/{personId}")
-    void rollback(@PathVariable int personId, @RequestBody List<HouseDtoResponse> houseDtoResponseList);
+    void rollbackDeletedCitizenFromHouses(@PathVariable int personId, @RequestBody List<HouseDtoResponse> houseDtoResponseList);
 
     @RequestMapping(method = RequestMethod.DELETE, value = "/delete/{personId}")
     void removePerson(@PathVariable int personId);

@@ -4,9 +4,10 @@ import com.nikitalipatov.cars.model.Car;
 import com.nikitalipatov.cars.repository.CarRepository;
 import com.nikitalipatov.cars.service.CarService;
 import com.nikitalipatov.cars.converter.CarConverter;
+import com.nikitalipatov.common.dto.kafka.CarDeleteStatus;
 import com.nikitalipatov.common.dto.response.CarDtoResponse;
 import com.nikitalipatov.common.dto.request.CarDtoRequest;
-import com.nikitalipatov.common.dto.response.DeletePersonDto;
+import com.nikitalipatov.common.enums.KafkaStatus;
 import com.nikitalipatov.common.error.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -21,7 +22,7 @@ public class CarServiceImpl implements CarService {
 
     private final CarRepository carRepository;
     private final CarConverter carConverter;
-    private final KafkaTemplate<String, DeletePersonDto> kafkaTemplate;
+    private final KafkaTemplate<String, Object> kafkaTemplate;
 
     @Override
     public List<CarDtoResponse> getAll() {
@@ -38,7 +39,8 @@ public class CarServiceImpl implements CarService {
     }
 
     @Override
-    public void rollback(int personId, List<CarDtoResponse> carList) {
+    @Transactional
+    public void rollbackDeletedPersonCars(int personId, List<CarDtoResponse> carList) {
         carList.forEach(car -> carRepository.save(
                 Car.builder()
                         .ownerId(personId)
@@ -52,7 +54,17 @@ public class CarServiceImpl implements CarService {
     }
 
     public void deletePersonCars(int personId) {
-
+        var personCars = getCitizenCar(personId);
+        try {
+            carRepository.deleteAllByOwnerId(personId);
+            kafkaTemplate.send("carEvents", CarDeleteStatus.builder()
+                    .carList(personCars)
+                    .carDeleteStatus(KafkaStatus.SUCCESS));
+        } catch (Exception e) {
+            kafkaTemplate.send("carEvents", CarDeleteStatus.builder()
+                    .carList(personCars)
+                    .carDeleteStatus(KafkaStatus.FAIL));
+        }
         carRepository.deleteAllByOwnerId(personId);
 
     }

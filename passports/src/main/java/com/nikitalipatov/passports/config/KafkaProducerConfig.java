@@ -1,7 +1,5 @@
-package com.nikitalipatov.citizens.kafka;
+package com.nikitalipatov.passports.config;
 
-import com.nikitalipatov.common.dto.response.DeletePersonDto;
-import com.nikitalipatov.common.dto.response.PersonCreationDto;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
@@ -18,12 +16,9 @@ import java.util.Map;
 
 @Configuration
 @RequiredArgsConstructor
-public class KafkaPersonProducerConfig {
+public class KafkaProducerConfig {
 
     private final KafkaProperties kafkaProperties;
-
-
-
 
     @Bean
     public Map<String, Object> producerConfigs() {
@@ -36,7 +31,6 @@ public class KafkaPersonProducerConfig {
                 JsonSerializer.class);
         props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:29092");
         return props;
-
     }
 
     @Bean
@@ -48,4 +42,5 @@ public class KafkaPersonProducerConfig {
     public KafkaTemplate<String, Object> kafkaTemplate() {
         return new KafkaTemplate<>(producerFactory());
     }
+
 }

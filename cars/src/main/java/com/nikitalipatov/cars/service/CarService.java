@@ -18,7 +18,7 @@ public interface CarService {
 
     Car getCar(int carId);
 
-    void rollback(int personId, List<CarDtoResponse> carList);
+    void rollbackDeletedPersonCars(int personId, List<CarDtoResponse> carList);
 
     List<CarDtoResponse> getCitizenCar(int personId);
 

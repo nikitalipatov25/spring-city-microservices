@@ -1,4 +1,4 @@
-package com.nikitalipatov.common.dto.request;
+package com.nikitalipatov.common.enums;
 
 public enum KafkaStatus {
     SUCCESS,

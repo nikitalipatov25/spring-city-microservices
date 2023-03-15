@@ -1,7 +1,5 @@
-package com.nikitalipatov.cars.kafka;
+package com.nikitalipatov.cars.config;
 
-import com.nikitalipatov.common.dto.response.DeletePersonDto;
-import com.nikitalipatov.common.dto.response.PersonCreationDto;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.context.annotation.Bean;
@@ -15,10 +13,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Configuration
-public class KafkaCarProducer {
+public class KafkaProducerConfig {
 
     @Bean
-    public ProducerFactory<String, DeletePersonDto> producerFactory() {
+    public ProducerFactory<String, Object> producerFactory() {
         Map<String, Object> configProps = new HashMap<>();
         configProps.put(
                 ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,
@@ -34,7 +32,7 @@ public class KafkaCarProducer {
     }
 
     @Bean
-    public KafkaTemplate<String, DeletePersonDto> kafkaTemplate() {
+    public KafkaTemplate<String, Object> kafkaTemplate() {
         return new KafkaTemplate<>(producerFactory());
     }
 }

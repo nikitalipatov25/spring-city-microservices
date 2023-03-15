@@ -1,5 +1,6 @@
 package com.nikitalipatov.citizens.model;
 
+import com.nikitalipatov.common.enums.ModelStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -23,4 +24,5 @@ public class Citizen {
 
     private String sex;
 
+    private Enum<ModelStatus> status;
 }

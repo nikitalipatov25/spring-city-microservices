@@ -1,7 +1,6 @@
-package com.nikitalipatov.cars.kafka;
+package com.nikitalipatov.houses.config;
 
 import com.nikitalipatov.common.dto.response.DeletePersonDto;
-import com.nikitalipatov.common.dto.response.PersonCreationDto;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.context.annotation.Bean;
@@ -18,7 +17,8 @@ import java.util.Map;
 
 @EnableKafka
 @Configuration
-public class KafcaCarConsumer {
+public class KafkaConsumerConfig {
+
     @Bean
     public ConsumerFactory<String, DeletePersonDto> consumerFactory() {
         Map<String, Object> props = new HashMap<>();
@@ -43,7 +43,7 @@ public class KafcaCarConsumer {
 
     @Bean
     public ConcurrentKafkaListenerContainerFactory<String, DeletePersonDto>
-    kafkaCarListenerContainerFactory() {
+    kafkaHouseListenerContainerFactory() {
 
         ConcurrentKafkaListenerContainerFactory<String, DeletePersonDto> factory =
                 new ConcurrentKafkaListenerContainerFactory<>();

@@ -8,7 +8,9 @@ import java.util.List;
 
 public interface CitizenService {
 
-    void rollback(PersonDtoResponse personDtoResponse);
+//    void rollbackDeletedCitizen(PersonDtoResponse personDtoResponse);
+
+    void rollbackDeletedCitizen(int citizenId);
 
     List<PersonDtoResponse> getAll();
 

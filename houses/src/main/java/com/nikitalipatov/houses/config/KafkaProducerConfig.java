@@ -1,4 +1,4 @@
-package com.nikitalipatov.houses.kafka;
+package com.nikitalipatov.houses.config;
 
 import com.nikitalipatov.common.dto.response.DeletePersonDto;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -14,10 +14,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Configuration
-public class KafkaHouseProducer {
+public class KafkaProducerConfig {
 
     @Bean
-    public ProducerFactory<String, DeletePersonDto> producerFactory() {
+    public ProducerFactory<String, Object> producerFactory() {
         Map<String, Object> configProps = new HashMap<>();
         configProps.put(
                 ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,
@@ -33,7 +33,7 @@ public class KafkaHouseProducer {
     }
 
     @Bean
-    public KafkaTemplate<String, DeletePersonDto> kafkaTemplate() {
+    public KafkaTemplate<String, Object> kafkaTemplate() {
         return new KafkaTemplate<>(producerFactory());
     }
 }

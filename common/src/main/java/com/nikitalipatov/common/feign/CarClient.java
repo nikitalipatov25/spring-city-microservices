@@ -12,7 +12,7 @@ import java.util.List;
 public interface CarClient {
 
     @RequestMapping(method = RequestMethod.POST, value = "/rollback/{personId}")
-    void rollback(@PathVariable int personId, @RequestBody List<CarDtoResponse> carDtoResponse);
+    void rollbackDeletedPersonCars(@PathVariable int personId, @RequestBody List<CarDtoResponse> carDtoResponse);
 
     @RequestMapping(method = RequestMethod.DELETE, value = "/delete/person/{personId}")
     void deletePersonCars(@PathVariable int personId);

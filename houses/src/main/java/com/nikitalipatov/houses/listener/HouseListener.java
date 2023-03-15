@@ -1,6 +1,6 @@
-package com.nikitalipatov.houses.kafka;
+package com.nikitalipatov.houses.listener;
 
-import com.nikitalipatov.common.dto.request.KafkaStatus;
+import com.nikitalipatov.common.enums.KafkaStatus;
 import com.nikitalipatov.common.dto.response.DeletePersonDto;
 import com.nikitalipatov.houses.service.HouseService;
 import lombok.RequiredArgsConstructor;
@@ -18,22 +18,22 @@ import org.springframework.transaction.annotation.Transactional;
 public class HouseListener {
 
     private final HouseService houseService;
-    private final KafkaTemplate<String, DeletePersonDto> kafkaTemplate;
+    private final KafkaTemplate<String, Object> kafkaTemplate;
 
     @KafkaHandler
     @Transactional
-    public void handleHouseDelete(DeletePersonDto deletePersonDto) {
+    public void houseDeleteHandler(DeletePersonDto deletePersonDto) {
        var personHouses = houseService.getPersonHouses(deletePersonDto.getPerson().getPersonId());
        try {
            houseService.removePerson(deletePersonDto.getPerson().getPersonId());
            deletePersonDto.setHouseDeleteStatus(KafkaStatus.SUCCESS);
            deletePersonDto.setHouseLst(personHouses);
-           kafkaTemplate.send("personEvents", deletePersonDto);
+           //kafkaTemplate.send("personEvents", deletePersonDto);
        } catch (Exception e) {
            e.printStackTrace();
            deletePersonDto.setHouseDeleteStatus(KafkaStatus.FAIL);
            deletePersonDto.setHouseLst(personHouses);
-           kafkaTemplate.send("personEvents", deletePersonDto);
+           kafkaTemplate.send("error", deletePersonDto);
        }
     }
 }

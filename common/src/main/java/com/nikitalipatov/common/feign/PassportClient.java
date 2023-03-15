@@ -12,9 +12,6 @@ public interface PassportClient {
     @RequestMapping(method = RequestMethod.POST, value = "/get")
     List<PassportDtoResponse> getPassportsByOwnerIds(@RequestBody List<Integer> ownersId);
 
-    @RequestMapping(method = RequestMethod.POST, value = "/rollback")
-    void rollback(@RequestBody PassportDtoResponse passportDtoResponse);
-
     @RequestMapping(method = RequestMethod.POST, value = "/create")
     PassportDtoResponse create(@RequestBody int personId);
 

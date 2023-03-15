@@ -1,5 +1,6 @@
 package com.nikitalipatov.passports.model;
 
+import com.nikitalipatov.common.enums.ModelStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -17,5 +18,6 @@ public class Passport {
     private int ownerId;
     private int serial;
     private int number;
+    private Enum<ModelStatus> status;
 
 }
