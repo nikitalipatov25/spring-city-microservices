@@ -4,15 +4,12 @@ import com.nikitalipatov.citizens.converter.PersonConverter;
 import com.nikitalipatov.citizens.model.Citizen;
 import com.nikitalipatov.citizens.repository.CitizenRepository;
 import com.nikitalipatov.citizens.service.CitizenService;
-import com.nikitalipatov.common.dto.request.DeleteStatus;
+import com.nikitalipatov.common.dto.request.KafkaStatus;
 import com.nikitalipatov.common.dto.response.*;
 import com.nikitalipatov.common.dto.request.PersonDtoRequest;
 import com.nikitalipatov.common.error.ResourceNotFoundException;
-import com.nikitalipatov.common.feign.CarClient;
-import com.nikitalipatov.common.feign.HouseClient;
 import com.nikitalipatov.common.feign.PassportClient;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
@@ -63,7 +60,7 @@ public class CitizenServiceImpl implements CitizenService {
     @Override
     public PersonDtoResponse create(PersonDtoRequest personDtoRequest) {
         Citizen person = personRepository.save(converter.toEntity(personDtoRequest));
-        kafkaTemplate.send("personEvents", new PersonCreationDto(DeleteStatus.SUCCESS, person.getId()));
+        kafkaTemplate.send("personEvents", new PersonCreationDto(KafkaStatus.SUCCESS, person.getId()));
         return converter.toDto(person);
     }
 
@@ -75,11 +72,11 @@ public class CitizenServiceImpl implements CitizenService {
                 .build();
         try {
             personRepository.deleteById(personId);
-            result.setPersonDeleteStatus(DeleteStatus.SUCCESS);
+            result.setPersonDeleteStatus(KafkaStatus.SUCCESS);
             kafkaTemplate.send("personEvents", result);
         } catch (Exception e) {
             personRepository.deleteById(personId);
-            result.setPersonDeleteStatus(DeleteStatus.FAIL);
+            result.setPersonDeleteStatus(KafkaStatus.FAIL);
             kafkaTemplate.send("personEvents", result);
         }
     }

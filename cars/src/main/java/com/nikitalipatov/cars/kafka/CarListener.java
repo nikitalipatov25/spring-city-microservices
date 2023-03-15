@@ -1,10 +1,8 @@
 package com.nikitalipatov.cars.kafka;
 
 import com.nikitalipatov.cars.service.CarService;
-import com.nikitalipatov.common.dto.request.DeleteStatus;
+import com.nikitalipatov.common.dto.request.KafkaStatus;
 import com.nikitalipatov.common.dto.response.DeletePersonDto;
-import com.nikitalipatov.common.feign.HouseClient;
-import com.nikitalipatov.common.feign.PassportClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaHandler;
@@ -29,11 +27,11 @@ public class CarListener {
         try {
             carService.deletePersonCars(deletePersonDto.getPerson().getPersonId());
             deletePersonDto.setCarList(personCars);
-            deletePersonDto.setCarDeleteStatus(DeleteStatus.SUCCESS);
+            deletePersonDto.setCarDeleteStatus(KafkaStatus.SUCCESS);
             kafkaTemplate.send("houseEvents", deletePersonDto);
         } catch (Exception e) {
             deletePersonDto.setCarList(personCars);
-            deletePersonDto.setCarDeleteStatus(DeleteStatus.FAIL);
+            deletePersonDto.setCarDeleteStatus(KafkaStatus.FAIL);
             kafkaTemplate.send("personEvents", deletePersonDto);
         }
     }

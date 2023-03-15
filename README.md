@@ -1,0 +1,1 @@
+![Image alt](C:\Users\zuzex\IdeaProjects\microservices\shema\1.png)

@@ -1,7 +1,7 @@
 package com.nikitalipatov.citizens.kafka;
 
 import com.nikitalipatov.citizens.service.CitizenService;
-import com.nikitalipatov.common.dto.request.DeleteStatus;
+import com.nikitalipatov.common.dto.request.KafkaStatus;
 import com.nikitalipatov.common.dto.response.DeletePersonDto;
 import com.nikitalipatov.common.dto.response.PersonCreationDto;
 import com.nikitalipatov.common.dto.response.PersonDeleteDto;
@@ -29,7 +29,7 @@ public class PersonListener {
 
     @KafkaHandler
     public void handlePersonCreation(PersonCreationDto personCreationDto) {
-        if (personCreationDto.getStatus().equals(DeleteStatus.SUCCESS)) {
+        if (personCreationDto.getStatus().equals(KafkaStatus.SUCCESS)) {
             passportClient.create(personCreationDto.getPersonId());
         }
     }
@@ -46,22 +46,22 @@ public class PersonListener {
     @KafkaHandler
     public void handlePersonDelete(DeletePersonDto deletePerson) {
 
-        if (deletePerson.getPersonDeleteStatus().equals(DeleteStatus.FAIL)) {
+        if (deletePerson.getPersonDeleteStatus().equals(KafkaStatus.FAIL)) {
             personService.rollback(deletePerson.getPerson());
         }
 
-        if (deletePerson.getPersonDeleteStatus().equals(DeleteStatus.FAIL)) {
+        if (deletePerson.getPersonDeleteStatus().equals(KafkaStatus.FAIL)) {
             passportClient.rollback(deletePerson.getPassport());
             personService.rollback(deletePerson.getPerson());
         }
 
-        if (deletePerson.getCarDeleteStatus().equals(DeleteStatus.FAIL)) {
+        if (deletePerson.getCarDeleteStatus().equals(KafkaStatus.FAIL)) {
             carClient.rollback(deletePerson.getPerson().getPersonId(), deletePerson.getCarList());
             passportClient.rollback(deletePerson.getPassport());
             personService.rollback(deletePerson.getPerson());
         }
 
-        if (deletePerson.getHouseDeleteStatus().equals(DeleteStatus.FAIL)) {
+        if (deletePerson.getHouseDeleteStatus().equals(KafkaStatus.FAIL)) {
             houseClient.rollback(deletePerson.getPerson().getPersonId(), deletePerson.getHouseLst());
             carClient.rollback(deletePerson.getPerson().getPersonId(), deletePerson.getCarList());
             passportClient.rollback(deletePerson.getPassport());

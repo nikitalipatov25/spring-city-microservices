@@ -1,8 +1,7 @@
 package com.nikitalipatov.common.dto.response;
 
-import com.nikitalipatov.common.dto.request.DeleteStatus;
+import com.nikitalipatov.common.dto.request.KafkaStatus;
 import lombok.*;
-import org.springframework.stereotype.Component;
 
 import java.util.List;
 
@@ -13,11 +12,11 @@ import java.util.List;
 @NoArgsConstructor
 public class DeletePersonDto {
     private PersonDtoResponse person;
-    private Enum<DeleteStatus> personDeleteStatus;
+    private Enum<KafkaStatus> personDeleteStatus;
     private PassportDtoResponse passport;
-    private Enum<DeleteStatus> passportDeleteStatus;
+    private Enum<KafkaStatus> passportDeleteStatus;
     private List<CarDtoResponse> carList;
-    private Enum<DeleteStatus> carDeleteStatus;
+    private Enum<KafkaStatus> carDeleteStatus;
     private List<HouseDtoResponse> houseLst;
-    private Enum<DeleteStatus> houseDeleteStatus;
+    private Enum<KafkaStatus> houseDeleteStatus;
 }

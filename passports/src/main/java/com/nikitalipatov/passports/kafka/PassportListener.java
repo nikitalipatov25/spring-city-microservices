@@ -1,9 +1,8 @@
 package com.nikitalipatov.passports.kafka;
 
-import com.nikitalipatov.common.dto.request.DeleteStatus;
+import com.nikitalipatov.common.dto.request.KafkaStatus;
 import com.nikitalipatov.common.dto.response.DeletePersonDto;
 import com.nikitalipatov.common.dto.response.PersonCreationDto;
-import com.nikitalipatov.common.feign.CarClient;
 import com.nikitalipatov.common.feign.CitizenClient;
 import com.nikitalipatov.passports.service.PassportService;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +25,7 @@ public class PassportListener {
 
     @KafkaHandler
     public void listenPassport(PersonCreationDto personCreationDto) {
-        if (personCreationDto.getStatus().equals("not ok")) {
+        if (personCreationDto.getStatus().equals(KafkaStatus.FAIL)) {
             passportService.delete(personCreationDto.getPersonId());
             citizenClient.rollbackCitizenCreation(personCreationDto.getPersonId());
         }
@@ -39,12 +38,12 @@ public class PassportListener {
         try {
             passportService.delete(deletePersonDto.getPerson().getPersonId());
             deletePersonDto.setPassport(passport);
-            deletePersonDto.setPassportDeleteStatus(DeleteStatus.SUCCESS);
+            deletePersonDto.setPassportDeleteStatus(KafkaStatus.SUCCESS);
             kafkaTemplate.send("carEvents", deletePersonDto);
         } catch (Exception e) {
             e.printStackTrace();
             deletePersonDto.setPassport(passport);
-            deletePersonDto.setPassportDeleteStatus(DeleteStatus.SUCCESS);
+            deletePersonDto.setPassportDeleteStatus(KafkaStatus.SUCCESS);
             kafkaTemplate.send("personEvents", deletePersonDto);
         }
     }

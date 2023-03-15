@@ -1,7 +1,6 @@
 package com.nikitalipatov.passports.service.impl;
 
-import com.nikitalipatov.common.dto.request.DeleteStatus;
-import com.nikitalipatov.common.dto.response.DeletePersonDto;
+import com.nikitalipatov.common.dto.request.KafkaStatus;
 import com.nikitalipatov.common.dto.response.PersonCreationDto;
 import com.nikitalipatov.common.dto.response.PassportDtoResponse;
 import com.nikitalipatov.common.error.ResourceNotFoundException;
@@ -13,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -40,9 +38,9 @@ public class PassportServiceImpl implements PassportService {
         Passport passport = new Passport();
         try {
             passport = passportRepository.save(passportConverter.toEntity(personId));
-            kafkaTemplate.send("passportEvents", new PersonCreationDto(DeleteStatus.SUCCESS, passport.getOwnerId()));
+            kafkaTemplate.send("passportEvents", new PersonCreationDto(KafkaStatus.SUCCESS, passport.getOwnerId()));
         } catch (Exception e) {
-            kafkaTemplate.send("passportEvents", new PersonCreationDto(DeleteStatus.FAIL, personId));
+            kafkaTemplate.send("passportEvents", new PersonCreationDto(KafkaStatus.FAIL, personId));
         }
         return passportConverter.toDto(passport);
     }

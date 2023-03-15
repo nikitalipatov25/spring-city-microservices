@@ -1,11 +1,7 @@
 package com.nikitalipatov.houses.kafka;
 
-import com.nikitalipatov.common.dto.request.DeleteStatus;
+import com.nikitalipatov.common.dto.request.KafkaStatus;
 import com.nikitalipatov.common.dto.response.DeletePersonDto;
-import com.nikitalipatov.common.feign.CarClient;
-import com.nikitalipatov.common.feign.CitizenClient;
-import com.nikitalipatov.common.feign.HouseClient;
-import com.nikitalipatov.common.feign.PassportClient;
 import com.nikitalipatov.houses.service.HouseService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,12 +26,12 @@ public class HouseListener {
        var personHouses = houseService.getPersonHouses(deletePersonDto.getPerson().getPersonId());
        try {
            houseService.removePerson(deletePersonDto.getPerson().getPersonId());
-           deletePersonDto.setHouseDeleteStatus(DeleteStatus.SUCCESS);
+           deletePersonDto.setHouseDeleteStatus(KafkaStatus.SUCCESS);
            deletePersonDto.setHouseLst(personHouses);
            kafkaTemplate.send("personEvents", deletePersonDto);
        } catch (Exception e) {
            e.printStackTrace();
-           deletePersonDto.setHouseDeleteStatus(DeleteStatus.FAIL);
+           deletePersonDto.setHouseDeleteStatus(KafkaStatus.FAIL);
            deletePersonDto.setHouseLst(personHouses);
            kafkaTemplate.send("personEvents", deletePersonDto);
        }

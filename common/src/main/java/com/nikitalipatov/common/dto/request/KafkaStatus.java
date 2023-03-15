@@ -1,6 +1,6 @@
 package com.nikitalipatov.common.dto.request;
 
-public enum DeleteStatus {
+public enum KafkaStatus {
     SUCCESS,
     FAIL
 }

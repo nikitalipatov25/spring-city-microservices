@@ -1,6 +1,6 @@
 package com.nikitalipatov.common.dto.response;
 
-import com.nikitalipatov.common.dto.request.DeleteStatus;
+import com.nikitalipatov.common.dto.request.KafkaStatus;
 import lombok.*;
 
 @Getter
@@ -10,5 +10,5 @@ import lombok.*;
 @NoArgsConstructor
 public class PersonDeleteDto {
     private PersonDtoResponse person;
-    private Enum<DeleteStatus> personDeleteStatus;
+    private Enum<KafkaStatus> personDeleteStatus;
 }
