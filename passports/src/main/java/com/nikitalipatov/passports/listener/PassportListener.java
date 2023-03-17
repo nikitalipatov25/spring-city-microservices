@@ -12,18 +12,18 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-@Slf4j
 @KafkaListener(topics = "citizenCommand", groupId = "test-gi", containerFactory = "kafkaListenerContainerFactory")
 public class PassportListener {
 
     private final PassportService passportService;
 
     @KafkaHandler
-    public void passportHandler(KafkaMessage<CitizenEvent> kafkaMessage) {
+    public void passportHandler(KafkaMessage kafkaMessage) {
+        var citizenId = kafkaMessage.getCitizenId();
         switch (kafkaMessage.getEventType()) {
-            case CITIZEN_CREATED -> passportService.create(kafkaMessage.getPayload().getCitizenId());
-            case CITIZEN_DELETED -> passportService.delete(kafkaMessage.getPayload().getCitizenId());
-            case PASSPORT_ROLLBACK -> passportService.rollbackDeletedPassport(kafkaMessage.getPayload().getCitizenId());
+            case CITIZEN_CREATED -> passportService.create(citizenId);
+            case CITIZEN_DELETED -> passportService.delete(citizenId);
+            case PASSPORT_ROLLBACK -> passportService.rollbackDeletedPassport(citizenId);
         }
     }
 }

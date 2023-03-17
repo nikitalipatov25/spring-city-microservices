@@ -1,5 +1,7 @@
 package com.nikitalipatov.citizens.config;
 
+import com.nikitalipatov.common.dto.kafka.CitizenEvent;
+import com.nikitalipatov.common.dto.kafka.KafkaMessage;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -27,8 +29,7 @@ public class KafkaConsumerConfig {
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
         props.put(JsonDeserializer.TRUSTED_PACKAGES, "*");
-        props.put(JsonDeserializer.TYPE_MAPPINGS, "citizenCreateDto:com.nikitalipatov.common.dto.kafka.CitizenCreateDto,citizenDeleteDto:com.nikitalipatov.common.dto.kafka.CitizenDeleteDto");
-        return new DefaultKafkaConsumerFactory<>(props);
+        return new DefaultKafkaConsumerFactory<>(props, new StringDeserializer(), new JsonDeserializer<>(Object.class));
     }
 
     @Bean
@@ -38,5 +39,4 @@ public class KafkaConsumerConfig {
         factory.setConsumerFactory(consumerFactory());
         return factory;
     }
-
 }

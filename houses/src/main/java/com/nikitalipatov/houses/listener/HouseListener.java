@@ -18,10 +18,10 @@ public class HouseListener {
     private final HouseService houseService;
 
     @KafkaHandler
-    public void houseHandler(KafkaMessage<CitizenEvent> kafkaMessage) {
+    public void houseHandler(KafkaMessage kafkaMessage) {
         switch (kafkaMessage.getEventType()) {
-            case CITIZEN_DELETED -> houseService.removePerson(kafkaMessage.getPayload().getCitizenId());
-            case HOUSE_ROLLBACK -> houseService.rollbackDeletedCitizenFromHouses(kafkaMessage.getPayload().getCitizenId());
+            case CITIZEN_DELETED -> houseService.removePerson(kafkaMessage.getCitizenId());
+            case HOUSE_ROLLBACK -> houseService.rollbackDeletedCitizenFromHouses(kafkaMessage.getCitizenId());
         }
     }
 }

@@ -26,7 +26,7 @@ public class CarServiceImpl implements CarService {
 
     private final CarRepository carRepository;
     private final CarConverter carConverter;
-    private final KafkaTemplate<String, KafkaMessage<CitizenEvent>> kafkaTemplate;
+    private final KafkaTemplate<String, KafkaMessage> kafkaTemplate;
 
     @Override
     public List<CarDtoResponse> getAll() {
@@ -56,23 +56,19 @@ public class CarServiceImpl implements CarService {
             var personCars = carRepository.findAllByOwnerId(personId);
             personCars.forEach(car -> car.setStatus(ModelStatus.DELETED));
             carRepository.saveAll(personCars);
-            var message = new KafkaMessage<>(
+            var message = new KafkaMessage(
                     UUID.randomUUID(),
                     Status.SUCCESS,
                     EventType.CAR_DELETED,
-                    CitizenEvent.builder()
-                            .citizenId(personId)
-                            .build()
+                    personId
             );
             kafkaTemplate.send("result", message);
         } catch (Exception e) {
-            var message = new KafkaMessage<>(
+            var message = new KafkaMessage(
                     UUID.randomUUID(),
                     Status.FAIL,
                     EventType.CAR_DELETED,
-                    CitizenEvent.builder()
-                            .citizenId(personId)
-                            .build()
+                    personId
             );
             kafkaTemplate.send("result", message);
         }

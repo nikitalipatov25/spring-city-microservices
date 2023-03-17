@@ -19,10 +19,10 @@ public class CarListener {
     private final CarService carService;
 
     @KafkaHandler
-    public void carHandler(KafkaMessage<CitizenEvent> kafkaMessage) {
+    public void carHandler(KafkaMessage kafkaMessage) {
         switch (kafkaMessage.getEventType()) {
-            case CITIZEN_DELETED -> carService.deletePersonCars(kafkaMessage.getPayload().getCitizenId());
-            case CAR_ROLLBACK -> carService.rollbackDeletedPersonCars(kafkaMessage.getPayload().getCitizenId());
+            case CITIZEN_DELETED -> carService.deletePersonCars(kafkaMessage.getCitizenId());
+            case CAR_ROLLBACK -> carService.rollbackDeletedPersonCars(kafkaMessage.getCitizenId());
         }
     }
 }

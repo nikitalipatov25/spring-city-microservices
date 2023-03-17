@@ -31,7 +31,7 @@ public class HouseServiceImpl implements HouseService {
     private final HouseRepository houseRepository;
     private final HouseConverter houseConverter;
     private final HousePersonRepository housePersonRepository;
-    private final KafkaTemplate<String, KafkaMessage<CitizenEvent>> kafkaTemplate;
+    private final KafkaTemplate<String, KafkaMessage> kafkaTemplate;
 
     public void rollbackDeletedCitizenFromHouses(int personId) {
         var personHouses = housePersonRepository.getCitizenHouses(personId);
@@ -63,23 +63,19 @@ public class HouseServiceImpl implements HouseService {
             var personHouses = housePersonRepository.getCitizenHouses(personId);
             personHouses.forEach(house -> house.setStatus(ModelStatus.DELETED));
             housePersonRepository.saveAll(personHouses);
-            var message = new KafkaMessage<>(
+            var message = new KafkaMessage(
                     UUID.randomUUID(),
                     Status.SUCCESS,
                     EventType.HOUSE_DELETED,
-                    CitizenEvent.builder()
-                            .citizenId(personId)
-                            .build()
+                    personId
             );
             kafkaTemplate.send("result", message);
         } catch (Exception e) {
-            var message = new KafkaMessage<>(
+            var message = new KafkaMessage(
                     UUID.randomUUID(),
                     Status.FAIL,
                     EventType.HOUSE_DELETED,
-                    CitizenEvent.builder()
-                            .citizenId(personId)
-                            .build()
+                    personId
             );
             kafkaTemplate.send("result", message);
         }

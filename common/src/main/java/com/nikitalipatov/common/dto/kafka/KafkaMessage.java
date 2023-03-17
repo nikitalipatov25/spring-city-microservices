@@ -10,9 +10,9 @@ import java.util.UUID;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class KafkaMessage<T> {
+public class KafkaMessage {
     private UUID messageId;
     private Status status;
     private EventType eventType;
-    private T payload;
+    private int citizenId;
 }

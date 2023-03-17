@@ -7,6 +7,6 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class CitizenEvent {
+public class CitizenEvent extends Object{
     private int citizenId;
 }

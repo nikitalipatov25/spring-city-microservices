@@ -27,7 +27,7 @@ public class PassportServiceImpl implements PassportService {
 
     private final PassportRepository passportRepository;
     private final PassportConverter passportConverter;
-    private final KafkaTemplate<String, KafkaMessage<CitizenEvent>> kafkaTemplate;
+    private final KafkaTemplate<String, KafkaMessage> kafkaTemplate;
 
 
     @Override
@@ -42,24 +42,20 @@ public class PassportServiceImpl implements PassportService {
         Passport passport= passportConverter.toEntity(personId);
         try {
             passportRepository.save(passport);
-            var message = new KafkaMessage<>(
+            var message = new KafkaMessage(
                     UUID.randomUUID(),
                     Status.SUCCESS,
                     EventType.PASSPORT_CREATED,
-                    CitizenEvent.builder()
-                            .citizenId(personId)
-                            .build()
+                    personId
             );
             kafkaTemplate.send("result", message);
         } catch (Exception e) {
             passportRepository.save(passport);
-            var message = new KafkaMessage<>(
+            var message = new KafkaMessage(
                     UUID.randomUUID(),
                     Status.FAIL,
                     EventType.PASSPORT_CREATED,
-                    CitizenEvent.builder()
-                            .citizenId(personId)
-                            .build()
+                    personId
             );
             kafkaTemplate.send("result", message);
         }
@@ -82,23 +78,19 @@ public class PassportServiceImpl implements PassportService {
             Passport passport = getPassport(personId);
             passport.setStatus(ModelStatus.DELETED);
             passportRepository.save(passport);
-            var message = new KafkaMessage<>(
+            var message = new KafkaMessage(
                     UUID.randomUUID(),
                     Status.SUCCESS,
                     EventType.PASSPORT_DELETED,
-                    CitizenEvent.builder()
-                            .citizenId(personId)
-                            .build()
+                    personId
             );
             kafkaTemplate.send("result", message);
         } catch (Exception e) {
-            var message = new KafkaMessage<>(
+            var message = new KafkaMessage(
                     UUID.randomUUID(),
                     Status.FAIL,
                     EventType.PASSPORT_DELETED,
-                    CitizenEvent.builder()
-                            .citizenId(personId)
-                            .build()
+                    personId
             );
             kafkaTemplate.send("result", message);
         }
