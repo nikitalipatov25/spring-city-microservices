@@ -4,8 +4,10 @@ import com.nikitalipatov.citizens.converter.PersonConverter;
 import com.nikitalipatov.citizens.model.Citizen;
 import com.nikitalipatov.citizens.repository.CitizenRepository;
 import com.nikitalipatov.citizens.service.CitizenService;
-import com.nikitalipatov.common.dto.kafka.CitizenCreateDto;
-import com.nikitalipatov.common.enums.KafkaStatus;
+import com.nikitalipatov.common.dto.kafka.CitizenEvent;
+import com.nikitalipatov.common.dto.kafka.KafkaMessage;
+import com.nikitalipatov.common.enums.EventType;
+import com.nikitalipatov.common.enums.Status;
 import com.nikitalipatov.common.dto.response.*;
 import com.nikitalipatov.common.dto.request.PersonDtoRequest;
 import com.nikitalipatov.common.enums.ModelStatus;
@@ -18,30 +20,35 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class CitizenServiceImpl implements CitizenService {
 
+    private final KafkaTemplate<String, KafkaMessage<CitizenEvent>> kafkaTemplate;
     private final CitizenRepository personRepository;
     private final PersonConverter converter;
     private final PassportClient passportClient;
-    private final KafkaTemplate<String, Object> kafkaTemplate;
 
-//    public void rollbackDeletedCitizen(PersonDtoResponse personDtoResponse) {
-//        personRepository.save(Citizen.builder()
-//                        .fullName(personDtoResponse.getName())
-//                        .age(personDtoResponse.getAge())
-//                        .sex(personDtoResponse.getSex())
-//                .build());
-//    }
-
-    public void rollbackDeletedCitizen(int citizenId) {
-        Citizen citizen = getPerson(citizenId);
-        citizen.setStatus(ModelStatus.ACTIVE);
-        personRepository.save(citizen);
-    }
+    @Override
+   public void rollback(int citizenId, EventType eventType) {
+       Citizen citizen = getPerson(citizenId);
+       if (citizen.getStatus().equals(ModelStatus.DELETED)) {
+           citizen.setStatus(ModelStatus.ACTIVE);
+           personRepository.save(citizen);
+       }
+       var message = new KafkaMessage<>(
+               UUID.randomUUID(),
+               Status.SUCCESS,
+               eventType,
+               CitizenEvent.builder()
+                       .citizenId(citizenId)
+                       .build()
+       );
+       kafkaTemplate.send("citizenCommand", message);
+   }
 
     @Override
     public void rollbackCitizenCreation(int personId) {
@@ -70,27 +77,33 @@ public class CitizenServiceImpl implements CitizenService {
     @Transactional
     public PersonDtoResponse create(PersonDtoRequest personDtoRequest) {
         Citizen person = personRepository.save(converter.toEntity(personDtoRequest));
-        kafkaTemplate.send("personSender", CitizenCreateDto.builder()
-                .citizenId(person.getId())
-                .citizenCreateStatus(KafkaStatus.SUCCESS));
+        var message = new KafkaMessage<>(
+                UUID.randomUUID(),
+                Status.SUCCESS,
+                EventType.CITIZEN_CREATED,
+                CitizenEvent.builder()
+                        .citizenId(person.getId())
+                        .build()
+        );
+        kafkaTemplate.send("citizenCommand", message);
         return converter.toDto(person);
     }
 
     @Override
+//    @Transactional
     public void delete(int personId) {
-        Citizen person = getPerson(personId);
-        var result = PersonDeleteDto.builder()
-                .person(converter.toDto(person))
-                .build();
-        try {
-            personRepository.deleteById(personId);
-            result.setPersonDeleteStatus(KafkaStatus.SUCCESS);
-            kafkaTemplate.send("personEvents", result);
-        } catch (Exception e) {
-            personRepository.deleteById(personId);
-            result.setPersonDeleteStatus(KafkaStatus.FAIL);
-            kafkaTemplate.send("personEvents", result);
-        }
+            Citizen person = getPerson(personId);
+            person.setStatus(ModelStatus.DELETED);
+            personRepository.save(person);
+            var message = new KafkaMessage<>(
+                    UUID.randomUUID(),
+                    Status.SUCCESS,
+                    EventType.CITIZEN_DELETED,
+                    CitizenEvent.builder()
+                            .citizenId(personId)
+                            .build()
+            );
+            kafkaTemplate.send("citizenCommand", message);
     }
 
     @Override

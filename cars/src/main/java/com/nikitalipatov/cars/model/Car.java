@@ -1,5 +1,6 @@
 package com.nikitalipatov.cars.model;
 
+import com.nikitalipatov.common.enums.ModelStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.BatchSize;
@@ -31,4 +32,6 @@ public class Car {
     private double price;
 
     private int ownerId;
+
+    private ModelStatus status;
 }

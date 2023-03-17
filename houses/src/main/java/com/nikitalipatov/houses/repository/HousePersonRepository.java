@@ -12,6 +12,9 @@ import java.util.List;
 
 public interface HousePersonRepository extends JpaRepository<HousePerson, HousePersonId> {
 
+    @Query(value = "SELECT hp.housePersonId, hp.status FROM HousePerson hp WHERE hp.housePersonId.ownerId=:ownerId")
+    List<HousePerson> getCitizenHouses(@Param("ownerId") int ownerId);
+
     @Transactional
     @Modifying
     @Query(value = "DELETE FROM HousePerson hp WHERE hp.housePersonId.ownerId=:ownerId")

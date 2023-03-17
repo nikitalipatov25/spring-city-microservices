@@ -1,5 +1,6 @@
 package com.nikitalipatov.common.dto.response;
 
+import com.nikitalipatov.common.enums.ModelStatus;
 import lombok.*;
 
 @Getter
@@ -15,4 +16,5 @@ public class CarDtoResponse {
     private String type;
     private String color;
     private double price;
+    private ModelStatus status;
 }

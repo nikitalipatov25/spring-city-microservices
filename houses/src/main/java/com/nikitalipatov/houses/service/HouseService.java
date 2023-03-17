@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface HouseService {
 
-    void rollbackDeletedCitizenFromHouses(int personId, List<HouseDtoResponse> houseDtoResponseList);
+    void rollbackDeletedCitizenFromHouses(int personId);
 
     List<HouseDtoResponse> getAll();
 

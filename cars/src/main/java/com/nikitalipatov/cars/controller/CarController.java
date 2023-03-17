@@ -16,10 +16,6 @@ public class CarController implements CarClient {
 
     private final CarService carService;
 
-    public void rollbackDeletedPersonCars(int personId, List<CarDtoResponse> carDtoResponse) {
-        carService.rollbackDeletedPersonCars(personId, carDtoResponse);
-    }
-
     @Override
     public CarDtoResponse createCars(@PathVariable int userId, @RequestBody CarDtoRequest carDtoRequest) {
         return carService.create(userId, carDtoRequest);

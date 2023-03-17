@@ -4,10 +4,13 @@ import com.nikitalipatov.cars.model.Car;
 import com.nikitalipatov.cars.repository.CarRepository;
 import com.nikitalipatov.cars.service.CarService;
 import com.nikitalipatov.cars.converter.CarConverter;
-import com.nikitalipatov.common.dto.kafka.CarDeleteStatus;
+import com.nikitalipatov.common.dto.kafka.CitizenEvent;
+import com.nikitalipatov.common.dto.kafka.KafkaMessage;
 import com.nikitalipatov.common.dto.response.CarDtoResponse;
 import com.nikitalipatov.common.dto.request.CarDtoRequest;
-import com.nikitalipatov.common.enums.KafkaStatus;
+import com.nikitalipatov.common.enums.EventType;
+import com.nikitalipatov.common.enums.Status;
+import com.nikitalipatov.common.enums.ModelStatus;
 import com.nikitalipatov.common.error.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -15,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -22,7 +26,7 @@ public class CarServiceImpl implements CarService {
 
     private final CarRepository carRepository;
     private final CarConverter carConverter;
-    private final KafkaTemplate<String, Object> kafkaTemplate;
+    private final KafkaTemplate<String, KafkaMessage<CitizenEvent>> kafkaTemplate;
 
     @Override
     public List<CarDtoResponse> getAll() {
@@ -40,33 +44,38 @@ public class CarServiceImpl implements CarService {
 
     @Override
     @Transactional
-    public void rollbackDeletedPersonCars(int personId, List<CarDtoResponse> carList) {
-        carList.forEach(car -> carRepository.save(
-                Car.builder()
-                        .ownerId(personId)
-                        .color(car.getColor())
-                        .gosNumber(car.getGosNumber())
-                        .model(car.getModel())
-                        .name(car.getName())
-                        .price(car.getPrice())
-                        .build()
-        ));
+    public void rollbackDeletedPersonCars(int personId) {
+        var personCars = carRepository.findAllByOwnerId(personId);
+        personCars.forEach(car -> car.setStatus(ModelStatus.ACTIVE));
+        carRepository.saveAll(personCars);
     }
 
+    @Transactional
     public void deletePersonCars(int personId) {
-        var personCars = getCitizenCar(personId);
         try {
-            carRepository.deleteAllByOwnerId(personId);
-            kafkaTemplate.send("carEvents", CarDeleteStatus.builder()
-                    .carList(personCars)
-                    .carDeleteStatus(KafkaStatus.SUCCESS));
+            var personCars = carRepository.findAllByOwnerId(personId);
+            personCars.forEach(car -> car.setStatus(ModelStatus.DELETED));
+            carRepository.saveAll(personCars);
+            var message = new KafkaMessage<>(
+                    UUID.randomUUID(),
+                    Status.SUCCESS,
+                    EventType.CAR_DELETED,
+                    CitizenEvent.builder()
+                            .citizenId(personId)
+                            .build()
+            );
+            kafkaTemplate.send("result", message);
         } catch (Exception e) {
-            kafkaTemplate.send("carEvents", CarDeleteStatus.builder()
-                    .carList(personCars)
-                    .carDeleteStatus(KafkaStatus.FAIL));
+            var message = new KafkaMessage<>(
+                    UUID.randomUUID(),
+                    Status.FAIL,
+                    EventType.CAR_DELETED,
+                    CitizenEvent.builder()
+                            .citizenId(personId)
+                            .build()
+            );
+            kafkaTemplate.send("result", message);
         }
-        carRepository.deleteAllByOwnerId(personId);
-
     }
 
     @Override

@@ -24,5 +24,5 @@ public class Citizen {
 
     private String sex;
 
-    private Enum<ModelStatus> status;
+    private ModelStatus status;
 }

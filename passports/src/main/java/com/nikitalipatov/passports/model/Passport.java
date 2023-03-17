@@ -18,6 +18,6 @@ public class Passport {
     private int ownerId;
     private int serial;
     private int number;
-    private Enum<ModelStatus> status;
+    private ModelStatus status;
 
 }

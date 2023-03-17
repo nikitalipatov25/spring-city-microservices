@@ -1,5 +1,6 @@
 package com.nikitalipatov.cars.config;
 
+import com.nikitalipatov.common.dto.kafka.KafkaMessage;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.context.annotation.Bean;
@@ -18,24 +19,19 @@ import java.util.Map;
 public class KafkaConsumerConfig {
 
     @Bean
-    public ConsumerFactory<String, Object> consumerFactory() {
-        final JsonDeserializer<Object> jsonDeserializer = new JsonDeserializer<>();
-        jsonDeserializer.addTrustedPackages("*");
+    public ConsumerFactory<String, KafkaMessage<Object>> consumerFactory() {
         Map<String, Object> props = new HashMap<>();
-        props.put(
-                ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,
-                "localhost:29092");
-        props.put(
-                ConsumerConfig.GROUP_ID_CONFIG,
-                "test-gi");
-        return new DefaultKafkaConsumerFactory<>(
-                props, new StringDeserializer(), jsonDeserializer
-        );
+        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:29092");
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, "test-gi");
+        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
+        props.put(JsonDeserializer.TRUSTED_PACKAGES, "*");
+        return new DefaultKafkaConsumerFactory<>(props);
     }
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, Object> kafkaCarListenerContainerFactory() {
-        ConcurrentKafkaListenerContainerFactory<String, Object> factory =
+    public ConcurrentKafkaListenerContainerFactory<String, KafkaMessage<Object>> kafkaCarListenerContainerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, KafkaMessage<Object>> factory =
                 new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory());
 

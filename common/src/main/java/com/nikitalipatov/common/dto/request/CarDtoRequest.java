@@ -1,5 +1,6 @@
 package com.nikitalipatov.common.dto.request;
 
+import com.nikitalipatov.common.enums.ModelStatus;
 import lombok.*;
 
 @Getter
@@ -15,4 +16,5 @@ public class CarDtoRequest {
     private String name;
     private String type;
     private String color;
+    private ModelStatus status;
 }

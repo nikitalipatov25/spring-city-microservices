@@ -1,5 +1,6 @@
 package com.nikitalipatov.houses.model;
 
+import com.nikitalipatov.common.enums.ModelStatus;
 import com.nikitalipatov.houses.key.HousePersonId;
 import jakarta.persistence.*;
 import lombok.*;
@@ -16,5 +17,6 @@ public class HousePerson {
     @EmbeddedId
     private HousePersonId housePersonId;
 
+    private ModelStatus status;
 }
 
