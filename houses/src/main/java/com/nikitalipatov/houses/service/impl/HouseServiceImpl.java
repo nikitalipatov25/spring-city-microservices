@@ -1,5 +1,6 @@
 package com.nikitalipatov.houses.service.impl;
 
+import com.nikitalipatov.common.dto.response.DeletePersonDto;
 import com.nikitalipatov.common.dto.response.HouseDtoResponse;
 import com.nikitalipatov.common.dto.request.HouseDtoRequest;
 import com.nikitalipatov.common.dto.response.HousePersonDto;
@@ -12,8 +13,8 @@ import com.nikitalipatov.houses.repository.HousePersonRepository;
 import com.nikitalipatov.houses.repository.HouseRepository;
 import com.nikitalipatov.houses.service.HouseService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -24,6 +25,11 @@ public class HouseServiceImpl implements HouseService {
     private final HouseRepository houseRepository;
     private final HouseConverter houseConverter;
     private final HousePersonRepository housePersonRepository;
+    private final KafkaTemplate<String, DeletePersonDto> kafkaTemplate;
+
+    public void rollback(int personId, List<HouseDtoResponse> houseDtoResponseList) {
+        houseDtoResponseList.forEach(house -> addCitizen(house.getHouseId(), personId));
+    }
 
     @Override
     public List<HouseDtoResponse> getAll() {
@@ -41,7 +47,8 @@ public class HouseServiceImpl implements HouseService {
     }
 
     public void removePerson(int personId) {
-        housePersonRepository.deleteAllByHousePersonId(personId);
+
+        housePersonRepository.deleteByOwnerId(personId);
     }
 
     @Override
@@ -60,5 +67,10 @@ public class HouseServiceImpl implements HouseService {
         return houseRepository.findById(houseId).orElseThrow(
                 () -> new ResourceNotFoundException("No such house with id " + houseId)
         );
+    }
+
+    @Override
+    public List<HouseDtoResponse> getPersonHouses(int ownerId) {
+        return houseConverter.toDto(houseRepository.getHousesByOwnerId(ownerId));
     }
 }

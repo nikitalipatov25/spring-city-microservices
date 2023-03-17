@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.web.client.RestTemplate;
 
 @SpringBootApplication
-@EnableFeignClients(clients = { PassportClient.class, HouseClient.class, CarClient.class })
+@EnableFeignClients(clients = {PassportClient.class, HouseClient.class, CarClient.class})
 public class CitizensApplication {
 
     public static void main(String[] args) {

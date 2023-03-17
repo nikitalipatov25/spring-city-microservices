@@ -8,6 +8,8 @@ import java.util.List;
 
 public interface CitizenService {
 
+    void rollback(PersonDtoResponse personDtoResponse);
+
     List<PersonDtoResponse> getAll();
 
     PersonDtoResponse getByName(String name);
@@ -15,6 +17,8 @@ public interface CitizenService {
     PersonDtoResponse create(PersonDtoRequest personDtoRequest);
 
     void delete(int id);
+
+    void rollbackCitizenCreation(int personId);
 
     PersonDtoResponse edit(int id, PersonDtoRequest personDtoRequest);
 

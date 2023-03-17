@@ -9,6 +9,8 @@ import lombok.*;
 @NoArgsConstructor
 public class PassportDtoResponse {
 
+    private String status;
+    private int ownerId;
     private int number;
     private int serial;
 }

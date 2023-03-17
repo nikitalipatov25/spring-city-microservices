@@ -1,6 +1,17 @@
 spring:
+#  kafka:
+#    consumer:
+#      group-id: test-gi
+#      auto-offset-reset: earliest
+#      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+#      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+#      properties:
+#        spring.json.trusted.packages: "*"
+#    bootstrap-servers: localhost:29092
+#    properties:
+#      spring.json.trusted.packages: "*"
   application:
-    name: cars-micro
+    name: passports-micro
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/spring-city-passports

@@ -4,17 +4,21 @@ import com.nikitalipatov.common.dto.response.PassportDtoResponse;
 import com.nikitalipatov.common.feign.PassportClient;
 import com.nikitalipatov.passports.service.PassportService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping(value = "/api/passport")
 @RequiredArgsConstructor
-public class PassportController implements PassportClient {
+@RequestMapping(value = "/api/passport")
+public class PassportController implements PassportClient{
 
     private final PassportService passportService;
+
+    @Override
+    public void rollback(PassportDtoResponse passportDtoResponse) {
+        passportService.rollback(passportDtoResponse);
+    }
 
     @Override
     public PassportDtoResponse create(@RequestBody int personId) {
@@ -22,14 +26,13 @@ public class PassportController implements PassportClient {
     }
 
     @Override
-    public List<PassportDtoResponse> getPassportsByOwnerIds(@RequestBody List<Integer> ownersId) {
-        return passportService.getAllByOwnerIds(ownersId);
+    public PassportDtoResponse getPassportByPersonId(@PathVariable int personId) {
+        return passportService.getByOwnerId(personId);
     }
 
-    @GetMapping(value = "/get/{personId}")
-    @ResponseStatus(value = HttpStatus.ACCEPTED)
-    public PassportDtoResponse getByOwnerId(@PathVariable int personId) {
-        return passportService.getByOwnerId(personId);
+    @Override
+    public List<PassportDtoResponse> getPassportsByOwnerIds(@RequestBody List<Integer> ownersId) {
+        return passportService.getAllByOwnerIds(ownersId);
     }
 
     @Override

@@ -18,6 +18,11 @@ public class CarController implements CarClient {
     private final CarService carService;
 
     @Override
+    public void rollback(int personId, List<CarDtoResponse> carDtoResponse) {
+        carService.rollback(personId, carDtoResponse);
+    }
+
+    @Override
     public CarDtoResponse createCars(@PathVariable int userId, @RequestBody CarDtoRequest carDtoRequest) {
         return carService.create(userId, carDtoRequest);
     }
