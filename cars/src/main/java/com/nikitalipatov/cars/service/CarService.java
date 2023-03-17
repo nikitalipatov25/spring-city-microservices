@@ -18,6 +18,10 @@ public interface CarService {
 
     Car getCar(int carId);
 
+//    void rollbackDeletedPersonCars(int personId, List<CarDtoResponse> carList);
+
+    void rollbackDeletedPersonCars(int personId);
+
     List<CarDtoResponse> getCitizenCar(int personId);
 
     void deletePersonCars(int personId);

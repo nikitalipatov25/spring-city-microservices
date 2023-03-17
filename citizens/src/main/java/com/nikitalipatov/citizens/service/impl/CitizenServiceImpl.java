@@ -4,46 +4,64 @@ import com.nikitalipatov.citizens.converter.PersonConverter;
 import com.nikitalipatov.citizens.model.Citizen;
 import com.nikitalipatov.citizens.repository.CitizenRepository;
 import com.nikitalipatov.citizens.service.CitizenService;
-import com.nikitalipatov.common.dto.kafka.PersonCreationDto;
+import com.nikitalipatov.common.dto.kafka.CitizenEvent;
+import com.nikitalipatov.common.dto.kafka.KafkaMessage;
 import com.nikitalipatov.common.dto.request.PersonDtoRequest;
-import com.nikitalipatov.common.dto.request.TDto;
 import com.nikitalipatov.common.dto.response.PassportDtoResponse;
 import com.nikitalipatov.common.dto.response.PersonDtoResponse;
+import com.nikitalipatov.common.enums.EventType;
+import com.nikitalipatov.common.enums.ModelStatus;
+import com.nikitalipatov.common.enums.Status;
 import com.nikitalipatov.common.error.ResourceNotFoundException;
-import com.nikitalipatov.common.feign.CarClient;
-import com.nikitalipatov.common.feign.HouseClient;
 import com.nikitalipatov.common.feign.PassportClient;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class CitizenServiceImpl implements CitizenService {
 
+    private final KafkaTemplate<String, KafkaMessage> kafkaTemplate;
     private final CitizenRepository personRepository;
     private final PersonConverter converter;
     private final PassportClient passportClient;
-    private final HouseClient houseClient;
-    private final CarClient carClient;
-
-    private final KafkaTemplate<String, PersonCreationDto> kafkaTemplate;
 
     @Override
-      public List<PersonDtoResponse> getAll() {
+    public void rollback(int citizenId, EventType eventType) {
+        Citizen citizen = getPerson(citizenId);
+        if (citizen.getStatus().equals(ModelStatus.DELETED)) {
+            citizen.setStatus(ModelStatus.ACTIVE);
+            personRepository.save(citizen);
+        }
+        var message = new KafkaMessage(
+                UUID.randomUUID(),
+                Status.SUCCESS,
+                eventType,
+                citizenId
+        );
+       kafkaTemplate.send("citizenCommand", message);
+    }
+
+    @Override
+    public void rollbackCitizenCreation(int personId) {
+        personRepository.delete(getPerson(personId));
+    }
+
+    @Override
+    public List<PersonDtoResponse> getAll() {
         var persons = personRepository.findAll();
         List<Integer> ownerIds = persons.stream().map(Citizen::getId).collect(Collectors.toList());
-        List<PassportDtoResponse> passportDtoResponses = passportClient.getPassportsByOwnerIds(ownerIds);
+        List<PassportDtoResponse> passports = passportClient.getPassportsByOwnerIds(ownerIds);
         List<PersonDtoResponse> personDtoResponses = new ArrayList<>();
         persons.forEach(person -> {
-            PassportDtoResponse passport = passportDtoResponses.get(person.getId());
+            PassportDtoResponse passport = passports.get(persons.indexOf(person));
             personDtoResponses.add(converter.toDto(person, passport));
         });
         return personDtoResponses;
@@ -55,25 +73,31 @@ public class CitizenServiceImpl implements CitizenService {
     }
 
     @Override
-       public PersonDtoResponse create(PersonDtoRequest personDtoRequest) {
+    @Transactional
+    public PersonDtoResponse create(PersonDtoRequest personDtoRequest) {
         Citizen person = personRepository.save(converter.toEntity(personDtoRequest));
-        kafkaTemplate.send("baeldung", new PersonCreationDto("Success", person.getId()));
-        //var passport = passportClient.create(tDto);
-        var passport = passportClient.getPassportByPersonId(person.getId());
-        return converter.toDto(person, Objects.requireNonNull(passport));
+        var message = new KafkaMessage(
+                UUID.randomUUID(),
+                Status.SUCCESS,
+                EventType.CITIZEN_CREATED,
+                person.getId()
+        );
+        kafkaTemplate.send("citizenCommand", message);
+        return converter.toDto(person);
     }
 
     @Override
-    @Transactional
     public void delete(int personId) {
-        // todo Если например в сервисе домов что то пойдет не так и вернется ошибка, то транзакция тебя тут не спасет и отката в сервисе
-        //  домов и паспортов не произойдет, в результате ты получишь не консистентные данные, что обычно весьма критично для бизнеса.
-        //  Вообще этот метод самый сложный во всем проекте, нужно подумать как сделать так, что бы если какой то из сервисов недоступен
-        //  у нас не ломалась логика
-        passportClient.delete(personId);
-        carClient.deletePersonCars(personId);
-        houseClient.removePerson(personId);
-        personRepository.deleteById(personId);
+        Citizen person = getPerson(personId);
+        person.setStatus(ModelStatus.DELETED);
+        personRepository.save(person);
+        var message = new KafkaMessage(
+                UUID.randomUUID(),
+                Status.SUCCESS,
+                EventType.CITIZEN_DELETED,
+                personId
+        );
+        kafkaTemplate.send("citizenCommand", message);
     }
 
     @Override

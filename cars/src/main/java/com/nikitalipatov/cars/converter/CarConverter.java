@@ -17,6 +17,7 @@ public class CarConverter {
                 .model(carDtoRequest.getModel())
                 .name(carDtoRequest.getName())
                 .gosNumber(carDtoRequest.getGosNumber())
+                .status(carDtoRequest.getStatus())
                 .build();
     }
 
@@ -28,6 +29,7 @@ public class CarConverter {
                 .name(carDtoRequest.getName())
                 .gosNumber(carDtoRequest.getGosNumber())
                 .ownerId(personId)
+                .status(carDtoRequest.getStatus())
                 .build();
     }
 
@@ -38,6 +40,7 @@ public class CarConverter {
                 .color(car.getColor())
                 .model(car.getModel())
                 .price(car.getPrice())
+                .status(car.getStatus())
                 .build();
     }
 

@@ -6,7 +6,7 @@ import lombok.*;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class PersonCreationDto {
-    private String status;
-    private int personId;
+@Builder
+public class CitizenEvent extends Object{
+    private int citizenId;
 }

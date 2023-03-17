@@ -1,5 +1,6 @@
 package com.nikitalipatov.houses.model;
 
+import com.nikitalipatov.common.enums.ModelStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -23,5 +24,5 @@ public class House {
 
     private String number;
 
-
+    private ModelStatus status;
 }
