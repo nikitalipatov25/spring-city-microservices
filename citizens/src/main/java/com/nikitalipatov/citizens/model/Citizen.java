@@ -18,11 +18,11 @@ public class Citizen {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "person_seq")
     private int id;
 
-    private String fullName;
+    private java.lang.String fullName;
 
     private int age;
 
-    private String sex;
+    private java.lang.String sex;
 
-    private ModelStatus status;
+    private String status;
 }

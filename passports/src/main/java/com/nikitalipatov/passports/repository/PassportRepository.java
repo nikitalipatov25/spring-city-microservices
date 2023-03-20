@@ -9,5 +9,5 @@ import java.util.Optional;
 public interface PassportRepository extends JpaRepository<Passport, Integer> {
     void deleteByOwnerId(int personId);
 
-    List<Passport> findAllByOwnerIdIn(List<Integer> ownerIds);
+    List<Passport> findAllByStatusAndOwnerIdIn(String status, List<Integer> ownerIds);
 }

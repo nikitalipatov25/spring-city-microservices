@@ -1,6 +1,5 @@
 package com.nikitalipatov.passports.service.impl;
 
-import com.nikitalipatov.common.dto.kafka.CitizenEvent;
 import com.nikitalipatov.common.dto.kafka.KafkaMessage;
 import com.nikitalipatov.common.dto.response.PassportDtoResponse;
 import com.nikitalipatov.common.enums.EventType;
@@ -27,13 +26,13 @@ public class PassportServiceImpl implements PassportService {
 
     private final PassportRepository passportRepository;
     private final PassportConverter passportConverter;
-    private final KafkaTemplate<String, KafkaMessage> kafkaTemplate;
+    private final KafkaTemplate<java.lang.String, KafkaMessage> kafkaTemplate;
 
 
     @Override
     public void rollbackDeletedPassport(int ownerId) {
         Passport passport = getPassport(ownerId);
-        passport.setStatus(ModelStatus.ACTIVE);
+        passport.setStatus(ModelStatus.ACTIVE.name());
         passportRepository.save(passport);
     }
 
@@ -63,7 +62,7 @@ public class PassportServiceImpl implements PassportService {
     }
 
     public List<PassportDtoResponse> getAllByOwnerIds(List<Integer> ownerIds) {
-        return passportConverter.toDto(passportRepository.findAllByOwnerIdIn(ownerIds));
+        return passportConverter.toDto(passportRepository.findAllByStatusAndOwnerIdIn("ACTIVE", ownerIds));
     }
 
     public PassportDtoResponse getByOwnerId(int personId) {
@@ -76,7 +75,7 @@ public class PassportServiceImpl implements PassportService {
     public void delete(int personId) {
         try {
             Passport passport = getPassport(personId);
-            passport.setStatus(ModelStatus.DELETED);
+            passport.setStatus(ModelStatus.DELETED.name());
             passportRepository.save(passport);
             var message = new KafkaMessage(
                     UUID.randomUUID(),

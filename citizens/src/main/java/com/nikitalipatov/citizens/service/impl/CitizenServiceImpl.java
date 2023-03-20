@@ -4,7 +4,6 @@ import com.nikitalipatov.citizens.converter.PersonConverter;
 import com.nikitalipatov.citizens.model.Citizen;
 import com.nikitalipatov.citizens.repository.CitizenRepository;
 import com.nikitalipatov.citizens.service.CitizenService;
-import com.nikitalipatov.common.dto.kafka.CitizenEvent;
 import com.nikitalipatov.common.dto.kafka.KafkaMessage;
 import com.nikitalipatov.common.dto.request.PersonDtoRequest;
 import com.nikitalipatov.common.dto.response.PassportDtoResponse;
@@ -28,16 +27,16 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CitizenServiceImpl implements CitizenService {
 
-    private final KafkaTemplate<String, KafkaMessage> kafkaTemplate;
+    private final KafkaTemplate<java.lang.String, KafkaMessage> kafkaTemplate;
     private final CitizenRepository personRepository;
-    private final PersonConverter converter;
+    private final PersonConverter citizenConverter;
     private final PassportClient passportClient;
 
     @Override
     public void rollback(int citizenId, EventType eventType) {
         Citizen citizen = getPerson(citizenId);
-        if (citizen.getStatus().equals(ModelStatus.DELETED)) {
-            citizen.setStatus(ModelStatus.ACTIVE);
+        if (citizen.getStatus().equals(ModelStatus.DELETED.name())) {
+            citizen.setStatus(ModelStatus.ACTIVE.name());
             personRepository.save(citizen);
         }
         var message = new KafkaMessage(
@@ -56,26 +55,26 @@ public class CitizenServiceImpl implements CitizenService {
 
     @Override
     public List<PersonDtoResponse> getAll() {
-        var persons = personRepository.findAll();
+        var persons = personRepository.findAllActive();
         List<Integer> ownerIds = persons.stream().map(Citizen::getId).collect(Collectors.toList());
         List<PassportDtoResponse> passports = passportClient.getPassportsByOwnerIds(ownerIds);
         List<PersonDtoResponse> personDtoResponses = new ArrayList<>();
         persons.forEach(person -> {
             PassportDtoResponse passport = passports.get(persons.indexOf(person));
-            personDtoResponses.add(converter.toDto(person, passport));
+            personDtoResponses.add(citizenConverter.toDto(person, passport));
         });
         return personDtoResponses;
     }
 
     @Override
-    public PersonDtoResponse getByName(String name) {
-        return converter.toDto(personRepository.findByFullName(name));
+    public PersonDtoResponse getByName(java.lang.String name) {
+        return citizenConverter.toDto(personRepository.findByFullName(name));
     }
 
     @Override
     @Transactional
     public PersonDtoResponse create(PersonDtoRequest personDtoRequest) {
-        Citizen person = personRepository.save(converter.toEntity(personDtoRequest));
+        Citizen person = personRepository.save(citizenConverter.toEntity(personDtoRequest));
         var message = new KafkaMessage(
                 UUID.randomUUID(),
                 Status.SUCCESS,
@@ -83,13 +82,13 @@ public class CitizenServiceImpl implements CitizenService {
                 person.getId()
         );
         kafkaTemplate.send("citizenCommand", message);
-        return converter.toDto(person);
+        return citizenConverter.toDto(person);
     }
 
     @Override
     public void delete(int personId) {
         Citizen person = getPerson(personId);
-        person.setStatus(ModelStatus.DELETED);
+        person.setStatus(ModelStatus.DELETED.name());
         personRepository.save(person);
         var message = new KafkaMessage(
                 UUID.randomUUID(),
@@ -103,7 +102,7 @@ public class CitizenServiceImpl implements CitizenService {
     @Override
     public PersonDtoResponse edit(int personId, PersonDtoRequest personDtoRequest) {
         Citizen person = getPerson(personId);
-        return converter.toDto(personRepository.save(converter.toEntityEdit(person, personDtoRequest)));
+        return citizenConverter.toDto(personRepository.save(citizenConverter.toEntity(person, personDtoRequest)));
     }
 
     @Override

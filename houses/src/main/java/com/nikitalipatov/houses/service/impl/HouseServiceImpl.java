@@ -1,6 +1,5 @@
 package com.nikitalipatov.houses.service.impl;
 
-import com.nikitalipatov.common.dto.kafka.CitizenEvent;
 import com.nikitalipatov.common.dto.kafka.KafkaMessage;
 import com.nikitalipatov.common.dto.response.HouseDtoResponse;
 import com.nikitalipatov.common.dto.request.HouseDtoRequest;
@@ -31,17 +30,17 @@ public class HouseServiceImpl implements HouseService {
     private final HouseRepository houseRepository;
     private final HouseConverter houseConverter;
     private final HousePersonRepository housePersonRepository;
-    private final KafkaTemplate<String, KafkaMessage> kafkaTemplate;
+    private final KafkaTemplate<java.lang.String, KafkaMessage> kafkaTemplate;
 
     public void rollbackDeletedCitizenFromHouses(int personId) {
         var personHouses = housePersonRepository.getCitizenHouses(personId);
-        personHouses.forEach(house -> house.setStatus(ModelStatus.ACTIVE));
+        personHouses.forEach(house -> house.setStatus(ModelStatus.ACTIVE.name()));
         housePersonRepository.saveAll(personHouses);
     }
 
     @Override
     public List<HouseDtoResponse> getAll() {
-        return houseConverter.toDto(houseRepository.findAll());
+        return houseConverter.toDto(houseRepository.findAllActive());
     }
 
     @Override
@@ -53,7 +52,7 @@ public class HouseServiceImpl implements HouseService {
         HousePersonId housePersonId = new HousePersonId(houseId, personId);
         return houseConverter.toDto(housePersonRepository.save(HousePerson.builder()
                 .housePersonId(housePersonId)
-                .status(ModelStatus.ACTIVE)
+                .status(ModelStatus.ACTIVE.name())
                 .build()));
     }
 
@@ -61,7 +60,7 @@ public class HouseServiceImpl implements HouseService {
     public void removePerson(int personId) {
         try {
             var personHouses = housePersonRepository.getCitizenHouses(personId);
-            personHouses.forEach(house -> house.setStatus(ModelStatus.DELETED));
+            personHouses.forEach(house -> house.setStatus(ModelStatus.DELETED.name()));
             housePersonRepository.saveAll(personHouses);
             var message = new KafkaMessage(
                     UUID.randomUUID(),
@@ -89,7 +88,7 @@ public class HouseServiceImpl implements HouseService {
     @Override
     public HouseDtoResponse edit(int houseId, HouseDtoRequest houseDtoRequest) {
         var house = getHouse(houseId);
-        return houseConverter.toDto(houseRepository.save(houseConverter.toEntityEdit(house, houseDtoRequest)));
+        return houseConverter.toDto(houseRepository.save(houseConverter.toEntity(house, houseDtoRequest)));
     }
 
     @Override

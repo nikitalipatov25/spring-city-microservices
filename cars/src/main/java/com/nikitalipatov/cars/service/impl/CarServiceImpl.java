@@ -4,7 +4,6 @@ import com.nikitalipatov.cars.model.Car;
 import com.nikitalipatov.cars.repository.CarRepository;
 import com.nikitalipatov.cars.service.CarService;
 import com.nikitalipatov.cars.converter.CarConverter;
-import com.nikitalipatov.common.dto.kafka.CitizenEvent;
 import com.nikitalipatov.common.dto.kafka.KafkaMessage;
 import com.nikitalipatov.common.dto.response.CarDtoResponse;
 import com.nikitalipatov.common.dto.request.CarDtoRequest;
@@ -26,16 +25,16 @@ public class CarServiceImpl implements CarService {
 
     private final CarRepository carRepository;
     private final CarConverter carConverter;
-    private final KafkaTemplate<String, KafkaMessage> kafkaTemplate;
+    private final KafkaTemplate<java.lang.String, KafkaMessage> kafkaTemplate;
 
     @Override
     public List<CarDtoResponse> getAll() {
-        return carConverter.toDto(carRepository.findAll());
+        return carConverter.toDto(carRepository.findAllActive());
     }
 
     @Override
-    public CarDtoResponse create(int personId, CarDtoRequest carDtoRequest) {
-        return carConverter.toDto(carRepository.save(carConverter.toEntity(carDtoRequest, personId)));
+    public CarDtoResponse create(CarDtoRequest carDtoRequest) {
+        return carConverter.toDto(carRepository.save(carConverter.toEntity(carDtoRequest)));
     }
 
     public List<CarDtoResponse> getCitizenCar(int personId) {
@@ -46,7 +45,7 @@ public class CarServiceImpl implements CarService {
     @Transactional
     public void rollbackDeletedPersonCars(int personId) {
         var personCars = carRepository.findAllByOwnerId(personId);
-        personCars.forEach(car -> car.setStatus(ModelStatus.ACTIVE));
+        personCars.forEach(car -> car.setStatus(ModelStatus.ACTIVE.name()));
         carRepository.saveAll(personCars);
     }
 
@@ -54,7 +53,7 @@ public class CarServiceImpl implements CarService {
     public void deletePersonCars(int personId) {
         try {
             var personCars = carRepository.findAllByOwnerId(personId);
-            personCars.forEach(car -> car.setStatus(ModelStatus.DELETED));
+            personCars.forEach(car -> car.setStatus(ModelStatus.DELETED.name()));
             carRepository.saveAll(personCars);
             var message = new KafkaMessage(
                     UUID.randomUUID(),

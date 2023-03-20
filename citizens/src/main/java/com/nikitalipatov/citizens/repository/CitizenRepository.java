@@ -25,4 +25,7 @@ public interface CitizenRepository extends JpaRepository<Citizen, Integer> {
     @Query(value = "SELECT DISTINCT person.id, person.full_name, person.age, person.passport_id FROM person JOIN house_person ON person.id = house_person.person_id WHERE person.full_name =?1", nativeQuery = true)
     List<Citizen> findHousesByFullName(String name);
 
+    @Query(value = "SELECT c.id, c.fullName, c.age, c.sex, c.status FROM Citizen c WHERE c.status = 'ACTIVE'")
+    List<Citizen> findAllActive();
+
 }

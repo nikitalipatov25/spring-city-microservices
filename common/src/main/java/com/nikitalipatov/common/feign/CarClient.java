@@ -14,8 +14,8 @@ public interface CarClient {
     @RequestMapping(method = RequestMethod.DELETE, value = "/delete/person/{personId}")
     void deletePersonCars(@PathVariable int personId);
 
-    @RequestMapping(method = RequestMethod.POST, value = "/create/{userId}")
-    CarDtoResponse createCars(@PathVariable int userId, @RequestBody CarDtoRequest carDtoRequest);
+    @RequestMapping(method = RequestMethod.POST, value = "/create")
+    CarDtoResponse createCars(@RequestBody CarDtoRequest carDtoRequest);
 
     @RequestMapping(method = RequestMethod.GET, value = "/list/{personId}")
     List<CarDtoResponse> getCitizenCar(@PathVariable int personId);

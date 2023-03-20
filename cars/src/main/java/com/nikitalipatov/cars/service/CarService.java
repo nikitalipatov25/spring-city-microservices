@@ -10,7 +10,7 @@ public interface CarService {
 
     List<CarDtoResponse> getAll();
 
-    CarDtoResponse create(int personId, CarDtoRequest carDtoRequest);
+    CarDtoResponse create(CarDtoRequest carDtoRequest);
 
     void deleteCar(int carId);
 

@@ -17,6 +17,6 @@ public class HousePerson {
     @EmbeddedId
     private HousePersonId housePersonId;
 
-    private ModelStatus status;
+    private String status;
 }
 
