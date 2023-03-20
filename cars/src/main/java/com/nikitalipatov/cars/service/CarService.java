@@ -10,7 +10,7 @@ public interface CarService {
 
     List<CarDtoResponse> getAll();
 
-    CarDtoResponse create(int personId, CarDtoRequest carDtoRequest);
+    CarDtoResponse create(CarDtoRequest carDtoRequest);
 
     void deleteCar(int carId);
 
@@ -18,7 +18,9 @@ public interface CarService {
 
     Car getCar(int carId);
 
-    void rollback(int personId, List<CarDtoResponse> carList);
+//    void rollbackDeletedPersonCars(int personId, List<CarDtoResponse> carList);
+
+    void rollbackDeletedPersonCars(int personId);
 
     List<CarDtoResponse> getCitizenCar(int personId);
 

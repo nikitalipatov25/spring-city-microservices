@@ -3,6 +3,7 @@ package com.nikitalipatov.houses.converter;
 import com.nikitalipatov.common.dto.response.HouseDtoResponse;
 import com.nikitalipatov.common.dto.request.HouseDtoRequest;
 import com.nikitalipatov.common.dto.response.HousePersonDto;
+import com.nikitalipatov.common.enums.ModelStatus;
 import com.nikitalipatov.houses.model.House;
 import com.nikitalipatov.houses.model.HousePerson;
 import org.springframework.stereotype.Component;
@@ -18,14 +19,16 @@ public class HouseConverter {
         return House.builder()
                 .street(houseDtoRequest.getStreet())
                 .number(houseDtoRequest.getNumber())
+                .status(ModelStatus.ACTIVE.name())
                 .build();
     }
 
 
-    public House toEntityEdit(House house, HouseDtoRequest houseDtoRequest) {
+    public House toEntity(House house, HouseDtoRequest houseDtoRequest) {
         return house.toBuilder()
                 .street(houseDtoRequest.getStreet())
                 .number(houseDtoRequest.getNumber())
+                .status(ModelStatus.ACTIVE.name())
                 .build();
     }
 

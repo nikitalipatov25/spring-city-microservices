@@ -1,8 +1,10 @@
 package com.nikitalipatov.passports.service.impl;
 
-import com.nikitalipatov.common.dto.request.KafkaStatus;
-import com.nikitalipatov.common.dto.response.PersonCreationDto;
+import com.nikitalipatov.common.dto.kafka.KafkaMessage;
 import com.nikitalipatov.common.dto.response.PassportDtoResponse;
+import com.nikitalipatov.common.enums.EventType;
+import com.nikitalipatov.common.enums.Status;
+import com.nikitalipatov.common.enums.ModelStatus;
 import com.nikitalipatov.common.error.ResourceNotFoundException;
 import com.nikitalipatov.passports.converter.PassportConverter;
 import com.nikitalipatov.passports.model.Passport;
@@ -12,8 +14,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -22,42 +26,73 @@ public class PassportServiceImpl implements PassportService {
 
     private final PassportRepository passportRepository;
     private final PassportConverter passportConverter;
-    private final KafkaTemplate<String, Object> kafkaTemplate;
+    private final KafkaTemplate<java.lang.String, KafkaMessage> kafkaTemplate;
+
 
     @Override
-    public void rollback(PassportDtoResponse passportDtoResponse) {
-        passportRepository.save(new Passport(
-                passportDtoResponse.getOwnerId(),
-                passportDtoResponse.getSerial(),
-                passportDtoResponse.getNumber()
-        ));
+    public void rollbackDeletedPassport(int ownerId) {
+        Passport passport = getPassport(ownerId);
+        passport.setStatus(ModelStatus.ACTIVE.name());
+        passportRepository.save(passport);
     }
 
     @Override
     public PassportDtoResponse create(int personId) {
-        Passport passport = new Passport();
+        Passport passport= passportConverter.toEntity(personId);
         try {
-            passport = passportRepository.save(passportConverter.toEntity(personId));
-            kafkaTemplate.send("passportEvents", new PersonCreationDto(KafkaStatus.SUCCESS, passport.getOwnerId()));
+            passportRepository.save(passport);
+            var message = new KafkaMessage(
+                    UUID.randomUUID(),
+                    Status.SUCCESS,
+                    EventType.PASSPORT_CREATED,
+                    personId
+            );
+            kafkaTemplate.send("result", message);
         } catch (Exception e) {
-            kafkaTemplate.send("passportEvents", new PersonCreationDto(KafkaStatus.FAIL, personId));
+            passportRepository.save(passport);
+            var message = new KafkaMessage(
+                    UUID.randomUUID(),
+                    Status.FAIL,
+                    EventType.PASSPORT_CREATED,
+                    personId
+            );
+            kafkaTemplate.send("result", message);
         }
         return passportConverter.toDto(passport);
     }
 
     public List<PassportDtoResponse> getAllByOwnerIds(List<Integer> ownerIds) {
-        return passportConverter.toDto(passportRepository.findAllByOwnerIdIn(ownerIds));
+        return passportConverter.toDto(passportRepository.findAllByStatusAndOwnerIdIn("ACTIVE", ownerIds));
     }
 
     public PassportDtoResponse getByOwnerId(int personId) {
         return passportConverter.toDto(getPassport(personId));
     }
 
+
     @Override
+    @Transactional
     public void delete(int personId) {
-
-        passportRepository.deleteByOwnerId(personId);
-
+        try {
+            Passport passport = getPassport(personId);
+            passport.setStatus(ModelStatus.DELETED.name());
+            passportRepository.save(passport);
+            var message = new KafkaMessage(
+                    UUID.randomUUID(),
+                    Status.SUCCESS,
+                    EventType.PASSPORT_DELETED,
+                    personId
+            );
+            kafkaTemplate.send("result", message);
+        } catch (Exception e) {
+            var message = new KafkaMessage(
+                    UUID.randomUUID(),
+                    Status.FAIL,
+                    EventType.PASSPORT_DELETED,
+                    personId
+            );
+            kafkaTemplate.send("result", message);
+        }
     }
 
     public Passport getPassport(int personId) {

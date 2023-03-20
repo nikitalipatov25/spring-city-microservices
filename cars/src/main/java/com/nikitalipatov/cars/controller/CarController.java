@@ -5,7 +5,6 @@ import com.nikitalipatov.common.dto.response.CarDtoResponse;
 import com.nikitalipatov.common.dto.request.CarDtoRequest;
 import com.nikitalipatov.common.feign.CarClient;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,13 +17,8 @@ public class CarController implements CarClient {
     private final CarService carService;
 
     @Override
-    public void rollback(int personId, List<CarDtoResponse> carDtoResponse) {
-        carService.rollback(personId, carDtoResponse);
-    }
-
-    @Override
-    public CarDtoResponse createCars(@PathVariable int userId, @RequestBody CarDtoRequest carDtoRequest) {
-        return carService.create(userId, carDtoRequest);
+    public CarDtoResponse createCars(@RequestBody CarDtoRequest carDtoRequest) {
+        return carService.create(carDtoRequest);
     }
 
     @Override

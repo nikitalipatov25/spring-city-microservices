@@ -24,23 +24,12 @@ public class KafkaTopicConfig {
     }
 
     @Bean
-    public NewTopic personEvents() {
-        return new NewTopic("personEvents", 1, (short) 1);
+    public NewTopic citizenCommand() {
+        return new NewTopic("citizenCommand", 1, (short) 1);
     }
 
     @Bean
-    public NewTopic passportEvents() {
-        return new NewTopic("passportEvents", 1, (short) 1);
+    public NewTopic result() {
+        return new NewTopic("result", 1, (short) 1);
     }
-
-    @Bean
-    public NewTopic carEvents() {
-        return new NewTopic("carEvents", 1, (short) 1);
-    }
-
-    @Bean
-    public NewTopic houseEvents() {
-        return new NewTopic("houseEvents", 1, (short) 1);
-    }
-
 }

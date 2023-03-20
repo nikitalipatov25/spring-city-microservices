@@ -16,11 +16,6 @@ public class PassportController implements PassportClient{
     private final PassportService passportService;
 
     @Override
-    public void rollback(PassportDtoResponse passportDtoResponse) {
-        passportService.rollback(passportDtoResponse);
-    }
-
-    @Override
     public PassportDtoResponse create(@RequestBody int personId) {
         return passportService.create(personId);
     }

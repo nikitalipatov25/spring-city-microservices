@@ -3,6 +3,7 @@ package com.nikitalipatov.cars.converter;
 import com.nikitalipatov.cars.model.Car;
 import com.nikitalipatov.common.dto.response.CarDtoResponse;
 import com.nikitalipatov.common.dto.request.CarDtoRequest;
+import com.nikitalipatov.common.enums.ModelStatus;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -17,17 +18,19 @@ public class CarConverter {
                 .model(carDtoRequest.getModel())
                 .name(carDtoRequest.getName())
                 .gosNumber(carDtoRequest.getGosNumber())
+                .status(ModelStatus.ACTIVE.name())
                 .build();
     }
 
 
-    public Car toEntity(CarDtoRequest carDtoRequest, int personId) {
+    public Car toEntity(CarDtoRequest carDtoRequest) {
         return Car.builder()
                 .color(carDtoRequest.getColor())
                 .model(carDtoRequest.getModel())
                 .name(carDtoRequest.getName())
                 .gosNumber(carDtoRequest.getGosNumber())
-                .ownerId(personId)
+                .ownerId(carDtoRequest.getOwnerId())
+                .status(ModelStatus.ACTIVE.name())
                 .build();
     }
 
@@ -38,6 +41,7 @@ public class CarConverter {
                 .color(car.getColor())
                 .model(car.getModel())
                 .price(car.getPrice())
+                .status(car.getStatus())
                 .build();
     }
 

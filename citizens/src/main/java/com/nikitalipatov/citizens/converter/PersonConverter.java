@@ -4,6 +4,7 @@ import com.nikitalipatov.citizens.model.Citizen;
 import com.nikitalipatov.common.dto.request.PersonDtoRequest;
 import com.nikitalipatov.common.dto.response.PassportDtoResponse;
 import com.nikitalipatov.common.dto.response.PersonDtoResponse;
+import com.nikitalipatov.common.enums.ModelStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -34,27 +35,21 @@ public class PersonConverter {
                 .build();
     }
 
-    public List<PersonDtoResponse> toDto(List<Citizen> personList) {
-        var persons = new ArrayList<PersonDtoResponse>();
-        for (Citizen citizen : personList) {
-            persons.add(toDto(citizen));
-        }
-        return persons;
-    }
-
     public Citizen toEntity(PersonDtoRequest personDtoRequest) {
         return Citizen.builder()
                 .sex(personDtoRequest.getSex())
                 .age(personDtoRequest.getAge())
                 .fullName(personDtoRequest.getFullName())
+                .status(ModelStatus.ACTIVE.name())
                 .build();
     }
 
-    public Citizen toEntityEdit(Citizen person, PersonDtoRequest personDtoRequest) {
+    public Citizen toEntity(Citizen person, PersonDtoRequest personDtoRequest) {
         return person.toBuilder()
                 .sex(personDtoRequest.getSex())
                 .age(personDtoRequest.getAge())
                 .fullName(personDtoRequest.getFullName())
+                .status(ModelStatus.ACTIVE.name())
                 .build();
     }
 

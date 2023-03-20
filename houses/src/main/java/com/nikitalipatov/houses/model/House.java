@@ -1,9 +1,8 @@
 package com.nikitalipatov.houses.model;
 
+import com.nikitalipatov.common.enums.ModelStatus;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.util.List;
 
 @Entity
 @Table(name = "house")
@@ -19,9 +18,9 @@ public class House {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "house_seq")
     private int id;
 
-    private String street;
+    private java.lang.String street;
 
-    private String number;
+    private java.lang.String number;
 
-
+    private String status;
 }
