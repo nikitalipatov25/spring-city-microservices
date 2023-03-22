@@ -56,6 +56,7 @@ public class CitizenServiceImpl implements CitizenService {
     @Override
     public List<PersonDtoResponse> getAll() {
         var persons = personRepository.findAllActive();
+        var a = persons.get(0);
         List<Integer> ownerIds = persons.stream().map(Citizen::getId).collect(Collectors.toList());
         List<PassportDtoResponse> passports = passportClient.getPassportsByOwnerIds(ownerIds);
         List<PersonDtoResponse> personDtoResponses = new ArrayList<>();

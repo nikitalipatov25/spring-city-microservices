@@ -1,15 +1,9 @@
 spring:
-#  kafka:
-#    consumer:
-#      group-id: test-gi
-#      auto-offset-reset: earliest
-#      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-#      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
-#      properties:
-#        spring.json.trusted.packages: "*"
-#    bootstrap-servers: localhost:29092
-#    properties:
-#      spring.json.trusted.packages: "*"
+#  security:
+#    oauth2:
+#      resourceserver:
+#        jwt:
+#          issuer-uri: http://localhost:9000
   application:
     name: passports-micro
   datasource:

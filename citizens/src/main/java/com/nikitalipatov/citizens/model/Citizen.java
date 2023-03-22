@@ -22,7 +22,7 @@ public class Citizen {
 
     private int age;
 
-    private java.lang.String sex;
+    private String sex;
 
     private String status;
 }
