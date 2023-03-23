@@ -13,7 +13,8 @@ public class ResourceServerConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http.authorizeHttpRequests(authz -> authz
-                        .requestMatchers("/resource/**").hasRole("ROLE_ADMIN")
+                        .requestMatchers("/resource/user").hasAuthority("SCOPE_read")
+                        .requestMatchers("/resource/admin").hasAuthority("SCOPE_read")
                         .anyRequest()
                         .authenticated()
                 )

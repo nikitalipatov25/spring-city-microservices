@@ -12,16 +12,15 @@ spring:
             client-secret: secret
             authorization-grant-type: authorization_code
             redirect-uri: "http://127.0.0.1:8080/login/oauth2/code/{registrationId}"
-            scope: openid
             client-name: gateway-client-oidc
-          gateway-client-authorization-code:
-            provider: spring
-            client-id: gateway-client
-            client-secret: secret
-            authorization-grant-type: authorization_code
-            redirect-uri: "http://127.0.0.1:8080/authorized"
-            scope: articles.read
-            client-name: gateway-client-authorization-code
+#          gateway-client-authorization-code:
+#            provider: spring
+#            client-id: gateway-client
+#            client-secret: secret
+#            authorization-grant-type: authorization_code
+#            redirect-uri: "http://127.0.0.1:8080/authorized"
+#            scope: articles.read
+#            client-name: gateway-client-authorization-code
         provider:
           spring:
             issuer-uri: http://localhost:9000
@@ -32,7 +31,7 @@ spring:
         - id: resource
           uri: http://127.0.0.1:8090
           predicates:
-            - Path=/resource
+            - Path=/resource/**
           filters:
             - TokenRelay=
         - id: citizens

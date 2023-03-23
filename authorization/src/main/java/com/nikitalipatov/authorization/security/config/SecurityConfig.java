@@ -85,18 +85,18 @@ public class SecurityConfig {
         return new InMemoryUserDetailsManager(userDetails);
     }
 
-    @Bean
-    public OAuth2TokenCustomizer<JwtEncodingContext> jwtCustomizer() {
-        return context -> {
-            if (context.getTokenType() == OAuth2TokenType.ACCESS_TOKEN) {
-                Authentication principal = context.getPrincipal();
-                Set<String> authorities = principal.getAuthorities().stream()
-                        .map(GrantedAuthority::getAuthority)
-                        .collect(Collectors.toSet());
-                context.getClaims().claim("roles", authorities);
-            }
-        };
-    }
+//    @Bean
+//    public OAuth2TokenCustomizer<JwtEncodingContext> jwtCustomizer() {
+//        return context -> {
+//            if (context.getTokenType() == OAuth2TokenType.ACCESS_TOKEN) {
+//                Authentication principal = context.getPrincipal();
+//                Set<String> authorities = principal.getAuthorities().stream()
+//                        .map(GrantedAuthority::getAuthority)
+//                        .collect(Collectors.toSet());
+//                context.getClaims().claim("roles", authorities);
+//            }
+//        };
+//    }
 
     @Bean
     public RegisteredClientRepository registeredClientRepository() {
@@ -106,13 +106,13 @@ public class SecurityConfig {
                 .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
                 .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
                 .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
-//                .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
+                .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
                 .redirectUri("http://127.0.0.1:8080/login/oauth2/code/gateway-client-oidc")
-                .redirectUri("http://127.0.0.1:8080/authorized") //!!!
+                //.redirectUri("http://127.0.0.1:8080/authorized") //!!!
 //                .redirectUri("http://127.0.0.1:8080/authorized")
 //                .redirectUri("https://oidcdebugger.com/debug")
-                .scope(OidcScopes.OPENID)
-                .scope("articles.read")
+//                .scope(OidcScopes.OPENID)
+                .scope("write")
                 .build();
 
         return new InMemoryRegisteredClientRepository(registeredClient);
@@ -151,7 +151,11 @@ public class SecurityConfig {
 
     @Bean
     public AuthorizationServerSettings authorizationServerSettings() {
-        return AuthorizationServerSettings.builder().build();
+        return AuthorizationServerSettings.builder()
+                .authorizationEndpoint("/oauth2/authorize")
+                .tokenEndpoint("/oauth2/token")
+                .jwkSetEndpoint("/oauth2/jwks")
+                .build();
     }
 
 }
