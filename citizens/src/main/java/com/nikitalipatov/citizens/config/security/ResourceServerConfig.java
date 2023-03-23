@@ -1,28 +1,22 @@
 package com.nikitalipatov.citizens.config.security;
 
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.oauth2.server.resource.OAuth2ResourceServerConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 
+@Configuration
 @EnableWebSecurity
 public class ResourceServerConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-        http.authorizeHttpRequests(authz -> authz
-                        .requestMatchers("/api/person/**").hasRole("ROLE_ADMIN")
-                        .anyRequest()
-                        .authenticated()
-                )
-                .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt);
-//                .httpBasic().disable()
-//                .csrf().disable()
-//                .formLogin().disable()
-//                .logout().disable();
+        http.securityMatcher("/api/person/**").authorizeHttpRequests(authz -> authz
+                .requestMatchers("/api/person/**").hasAuthority("SCOPE_read")
+                .anyRequest().authenticated()
+        ).oauth2ResourceServer().jwt();
         return http.build();
     }
-
 }

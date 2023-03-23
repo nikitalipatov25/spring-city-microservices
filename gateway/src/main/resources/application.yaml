@@ -13,7 +13,7 @@ spring:
             authorization-grant-type: authorization_code
             redirect-uri: "http://127.0.0.1:8080/login/oauth2/code/{registrationId}"
             client-name: gateway-client-oidc
-            scope: write
+            scope: write, read
         provider:
           spring:
             issuer-uri: http://localhost:9000
@@ -21,12 +21,6 @@ spring:
   cloud:
     gateway:
       routes:
-        - id: resource
-          uri: http://127.0.0.1:8090
-          predicates:
-            - Path=/resource/**
-          filters:
-            - TokenRelay=
         - id: citizens
           uri: http://127.0.0.1:8082
           predicates:
