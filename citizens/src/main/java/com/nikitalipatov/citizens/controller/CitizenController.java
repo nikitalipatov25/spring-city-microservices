@@ -6,6 +6,7 @@ import com.nikitalipatov.common.dto.response.PersonDtoResponse;
 import com.nikitalipatov.common.feign.CitizenClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,12 +23,19 @@ public class CitizenController implements CitizenClient {
         personService.rollbackCitizenCreation(personId);
     }
 
+    @Override
+    public int getNumOfCitizens() {
+        return personService.getNumOfActiveCitizens();
+    }
+
+    @PreAuthorize("hasRole('write')")
     @GetMapping(value = "/list")
     @ResponseStatus(value = HttpStatus.ACCEPTED)
     public List<PersonDtoResponse> getAll() {
         return personService.getAll();
     }
 
+    @PreAuthorize("hasRole('read')")
     @GetMapping(value = "/{name}")
     @ResponseStatus(value = HttpStatus.ACCEPTED)
     public PersonDtoResponse getByName(@PathVariable String name) {

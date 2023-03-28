@@ -13,4 +13,7 @@ public interface HouseRepository extends JpaRepository<House, Integer> {
 
     @Query(value = "SELECT h.id, h.street, h.number, h.status FROM House h WHERE h.status = 'ACTIVE'")
     List<House> findAllActive();
+
+    @Query(value = "select count(h) from House h WHERE h.status = 'ACTIVE'")
+    int countActiveHouses();
 }

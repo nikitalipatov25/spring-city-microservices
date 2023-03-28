@@ -12,8 +12,6 @@ public interface PassportService {
 
     void delete(int personId);
 
-//    void rollbackDeletedPassport(PassportDtoResponse passportDtoResponse);
-
     void rollbackDeletedPassport(int ownerId);
 
     PassportDtoResponse getByOwnerId(int personId);

@@ -13,4 +13,7 @@ public interface CitizenRepository extends JpaRepository<Citizen, Integer> {
     @Query(value = "SELECT * FROM person WHERE person.status = 'ACTIVE'", nativeQuery = true)
     List<Citizen> findAllActive();
 
+    @Query("SELECT count(c) FROM Citizen c WHERE c.status = 'ACTIVE'")
+    int countActiveCitizens();
+
 }

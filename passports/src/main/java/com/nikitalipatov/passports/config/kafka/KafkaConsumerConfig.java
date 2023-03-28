@@ -1,4 +1,4 @@
-package com.nikitalipatov.passports.config;
+package com.nikitalipatov.passports.config.kafka;
 
 import com.nikitalipatov.common.dto.kafka.KafkaMessage;
 import lombok.RequiredArgsConstructor;

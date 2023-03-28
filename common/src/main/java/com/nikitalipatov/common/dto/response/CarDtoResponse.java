@@ -10,11 +10,11 @@ import lombok.*;
 @NoArgsConstructor
 public class CarDtoResponse {
 
-    private java.lang.String gosNumber;
-    private java.lang.String model;
-    private java.lang.String name;
-    private java.lang.String type;
-    private java.lang.String color;
+    private String gosNumber;
+    private String model;
+    private String name;
+    private String type;
+    private String color;
     private double price;
     private String status;
 }

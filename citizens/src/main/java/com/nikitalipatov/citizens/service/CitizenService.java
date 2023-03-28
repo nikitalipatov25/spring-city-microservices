@@ -25,4 +25,6 @@ public interface CitizenService {
 
     void rollback(int citizenId, EventType eventType);
 
+    int getNumOfActiveCitizens();
+
 }

@@ -18,9 +18,9 @@ public class House {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "house_seq")
     private int id;
 
-    private java.lang.String street;
+    private String street;
 
-    private java.lang.String number;
+    private String number;
 
     private String status;
 }

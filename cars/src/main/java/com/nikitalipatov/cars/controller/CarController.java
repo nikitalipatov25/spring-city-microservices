@@ -17,7 +17,7 @@ public class CarController implements CarClient {
     private final CarService carService;
 
     @Override
-    public CarDtoResponse createCars(@RequestBody CarDtoRequest carDtoRequest) {
+    public CarDtoResponse createCars(@RequestBody CarDtoRequest carDtoRequest) throws InterruptedException {
         return carService.create(carDtoRequest);
     }
 

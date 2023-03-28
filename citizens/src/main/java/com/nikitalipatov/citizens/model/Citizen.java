@@ -18,7 +18,7 @@ public class Citizen {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "person_seq")
     private int id;
 
-    private java.lang.String fullName;
+    private String fullName;
 
     private int age;
 

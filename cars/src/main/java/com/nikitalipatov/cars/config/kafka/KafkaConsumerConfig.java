@@ -1,4 +1,4 @@
-package com.nikitalipatov.cars.config;
+package com.nikitalipatov.cars.config.kafka;
 
 import com.nikitalipatov.common.dto.kafka.KafkaMessage;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -34,6 +34,7 @@ public class KafkaConsumerConfig {
         ConcurrentKafkaListenerContainerFactory<String, Object> factory =
                 new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory());
+        factory.setAutoStartup(false);
         return factory;
     }
 

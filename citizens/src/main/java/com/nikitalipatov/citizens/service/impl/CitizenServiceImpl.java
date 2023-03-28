@@ -13,24 +13,57 @@ import com.nikitalipatov.common.enums.ModelStatus;
 import com.nikitalipatov.common.enums.Status;
 import com.nikitalipatov.common.error.ResourceNotFoundException;
 import com.nikitalipatov.common.feign.PassportClient;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.messaging.simp.stomp.StompSession;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@EnableScheduling
 public class CitizenServiceImpl implements CitizenService {
 
-    private final KafkaTemplate<java.lang.String, KafkaMessage> kafkaTemplate;
+    private final KafkaTemplate<String, KafkaMessage> kafkaTemplate;
     private final CitizenRepository personRepository;
     private final PersonConverter citizenConverter;
     private final PassportClient passportClient;
+    private final StompSession stompSession;
+
+    private static int numberOfCitizens;
+
+    @PostConstruct
+    public void init() {
+        numberOfCitizens = personRepository.countActiveCitizens();
+    }
+
+    @Scheduled(fixedDelay = 300000)
+    public void updateNumOfCars() {
+        stompSession.send("/app/logs", citizenConverter.toLog(numberOfCitizens));
+    }
+
+    @Async
+    @Scheduled(fixedDelay = 60000)
+    public void cloneFactory() {
+        for (int i = 0; i < 10; i++) {
+            create(PersonDtoRequest.builder()
+                    .fullName("Citizen Clone " + ThreadLocalRandom.current().nextInt(1, 9999))
+                    .sex("Clone")
+                    .age(ThreadLocalRandom.current().nextInt(18, 99))
+                    .build());
+        }
+    }
+
 
     @Override
     public void rollback(int citizenId, EventType eventType) {
@@ -51,6 +84,7 @@ public class CitizenServiceImpl implements CitizenService {
     @Override
     public void rollbackCitizenCreation(int personId) {
         personRepository.delete(getPerson(personId));
+        numberOfCitizens = numberOfCitizens - 1;
     }
 
     @Override
@@ -68,7 +102,7 @@ public class CitizenServiceImpl implements CitizenService {
     }
 
     @Override
-    public PersonDtoResponse getByName(java.lang.String name) {
+    public PersonDtoResponse getByName(String name) {
         return citizenConverter.toDto(personRepository.findByFullName(name));
     }
 
@@ -76,6 +110,7 @@ public class CitizenServiceImpl implements CitizenService {
     @Transactional
     public PersonDtoResponse create(PersonDtoRequest personDtoRequest) {
         Citizen person = personRepository.save(citizenConverter.toEntity(personDtoRequest));
+        numberOfCitizens = numberOfCitizens + 1;
         var message = new KafkaMessage(
                 UUID.randomUUID(),
                 Status.SUCCESS,
@@ -83,6 +118,7 @@ public class CitizenServiceImpl implements CitizenService {
                 person.getId()
         );
         kafkaTemplate.send("citizenCommand", message);
+        stompSession.send("/app/logs", citizenConverter.toLog("create", 1));
         return citizenConverter.toDto(person);
     }
 
@@ -98,6 +134,8 @@ public class CitizenServiceImpl implements CitizenService {
                 personId
         );
         kafkaTemplate.send("citizenCommand", message);
+        stompSession.send("/app/logs", citizenConverter.toLog("delete", 1));
+        numberOfCitizens = numberOfCitizens - 1;
     }
 
     @Override
@@ -111,6 +149,11 @@ public class CitizenServiceImpl implements CitizenService {
         return personRepository.findById(personId).orElseThrow(
                 () -> new ResourceNotFoundException("No such person with id " + personId)
         );
+    }
+
+    @Override
+    public int getNumOfActiveCitizens() {
+        return personRepository.countActiveCitizens();
     }
 
 }

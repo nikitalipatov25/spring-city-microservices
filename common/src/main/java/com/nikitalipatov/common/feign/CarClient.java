@@ -15,7 +15,7 @@ public interface CarClient {
     void deletePersonCars(@PathVariable int personId);
 
     @RequestMapping(method = RequestMethod.POST, value = "/create")
-    CarDtoResponse createCars(@RequestBody CarDtoRequest carDtoRequest);
+    CarDtoResponse createCars(@RequestBody CarDtoRequest carDtoRequest) throws InterruptedException;
 
     @RequestMapping(method = RequestMethod.GET, value = "/list/{personId}")
     List<CarDtoResponse> getCitizenCar(@PathVariable int personId);

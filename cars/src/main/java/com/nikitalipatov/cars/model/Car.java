@@ -18,17 +18,31 @@ public class Car {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "car_seq")
     private int id;
 
-    private java.lang.String gosNumber;
+    private String gosNumber;
 
-    private java.lang.String model;
+    private String model;
 
-    private java.lang.String name;
+    private String name;
 
-    private java.lang.String color;
+    private String color;
 
     private double price;
 
     private int ownerId;
 
     private String status;
+
+    @Override
+    public String toString() {
+        return "Car{" +
+                "id=" + id +
+                ", gosNumber='" + gosNumber + '\'' +
+                ", model='" + model + '\'' +
+                ", name='" + name + '\'' +
+                ", color='" + color + '\'' +
+                ", price=" + price +
+                ", ownerId=" + ownerId +
+                ", status='" + status + '\'' +
+                '}';
+    }
 }
