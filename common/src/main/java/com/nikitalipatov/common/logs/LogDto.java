@@ -10,7 +10,7 @@ import java.text.SimpleDateFormat;
 @NoArgsConstructor
 @Builder
 @ToString
-public class MyLog {
+public class LogDto {
 
     private String logType;
     private String logEntity;

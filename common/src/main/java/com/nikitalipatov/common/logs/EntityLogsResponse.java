@@ -10,8 +10,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 public class EntityLogsResponse {
-
     private String entityName;
-    private Date time;
+    private Date logDate;
     private int numberOfEntities;
 }

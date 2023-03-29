@@ -28,14 +28,14 @@ public class CitizenController implements CitizenClient {
         return personService.getNumOfActiveCitizens();
     }
 
-    @PreAuthorize("hasRole('write')")
+//    @PreAuthorize("hasRole('write')")
     @GetMapping(value = "/list")
     @ResponseStatus(value = HttpStatus.ACCEPTED)
     public List<PersonDtoResponse> getAll() {
         return personService.getAll();
     }
 
-    @PreAuthorize("hasRole('read')")
+//    @PreAuthorize("hasRole('read')")
     @GetMapping(value = "/{name}")
     @ResponseStatus(value = HttpStatus.ACCEPTED)
     public PersonDtoResponse getByName(@PathVariable String name) {

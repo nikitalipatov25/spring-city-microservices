@@ -11,11 +11,14 @@ import java.util.List;
 public interface CitizenClient {
 
     @RequestMapping(method = RequestMethod.GET, value = "/rollback/{personId}")
+//    @GetMapping(value = "/rollback/{personId}")
     void rollbackCitizenCreation(@PathVariable int personId);
 
     @RequestMapping(method = RequestMethod.GET, value = "/list")
+//    @GetMapping(value = "/list")
     List<PersonDtoResponse> getAll();
 
     @RequestMapping(method = RequestMethod.GET, value = "/number")
+//    @GetMapping(value = "/number")
     int getNumOfCitizens();
 }

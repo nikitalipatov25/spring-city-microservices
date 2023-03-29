@@ -12,6 +12,6 @@ public interface PassportRepository extends JpaRepository<Passport, Integer> {
 
     List<Passport> findAllByStatusAndOwnerIdIn(String status, List<Integer> ownerIds);
 
-    @Query(value = "select count(p) from Passport p WHERE p.status = 'ACTIVE'")
+    @Query(value = "select count(*) from Passport p WHERE p.status = 'ACTIVE'")
     int countActivePassports();
 }

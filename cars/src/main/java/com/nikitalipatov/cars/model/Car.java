@@ -11,11 +11,11 @@ import lombok.*;
 @Getter
 @Setter
 @Builder(toBuilder = true)
+@ToString
 public class Car {
 
     @Id
-    @SequenceGenerator(name = "car_seq", allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "car_seq")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private int id;
 
     private String gosNumber;
@@ -26,23 +26,8 @@ public class Car {
 
     private String color;
 
-    private double price;
-
     private int ownerId;
 
     private String status;
 
-    @Override
-    public String toString() {
-        return "Car{" +
-                "id=" + id +
-                ", gosNumber='" + gosNumber + '\'' +
-                ", model='" + model + '\'' +
-                ", name='" + name + '\'' +
-                ", color='" + color + '\'' +
-                ", price=" + price +
-                ", ownerId=" + ownerId +
-                ", status='" + status + '\'' +
-                '}';
-    }
 }

@@ -4,7 +4,7 @@ import com.nikitalipatov.common.dto.response.HouseDtoResponse;
 import com.nikitalipatov.common.dto.request.HouseDtoRequest;
 import com.nikitalipatov.common.dto.response.HousePersonDto;
 import com.nikitalipatov.common.enums.ModelStatus;
-import com.nikitalipatov.common.logs.MyLog;
+import com.nikitalipatov.common.logs.LogDto;
 import com.nikitalipatov.houses.model.House;
 import com.nikitalipatov.houses.model.HousePerson;
 import org.springframework.stereotype.Component;
@@ -14,28 +14,27 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.stream.Collectors;
+
+import static com.nikitalipatov.common.constant.Constants.SIMPLE_DATE_FORMAT;
 
 @Component
 public class HouseConverter {
 
-    private final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH);
-
-    public MyLog toLog(String logType, int numOfEntities) {
-        return MyLog.builder()
+    public LogDto toLog(String logType, int numOfEntities) {
+        return LogDto.builder()
                 .logType(logType)
                 .logEntity("house")
                 .numOfEntities(numOfEntities)
-                .time(simpleDateFormat.format(new Date()))
+                .time(SIMPLE_DATE_FORMAT.format(new Date()))
                 .build();
     }
 
-    public MyLog toLog(int numOfEntities) {
-        return MyLog.builder()
+    public LogDto toLog(int numOfEntities) {
+        return LogDto.builder()
                 .logType("update")
                 .logEntity("house")
                 .numOfEntities(numOfEntities)
-                .time(simpleDateFormat.format(new Date()))
+                .time(SIMPLE_DATE_FORMAT.format(new Date()))
                 .build();
     }
 

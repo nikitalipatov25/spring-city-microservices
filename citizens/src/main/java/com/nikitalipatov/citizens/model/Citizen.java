@@ -14,8 +14,7 @@ import lombok.*;
 public class Citizen {
 
     @Id
-    @SequenceGenerator(name = "person_seq", allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "person_seq")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private int id;
 
     private String fullName;

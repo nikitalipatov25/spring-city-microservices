@@ -10,7 +10,7 @@ public interface CarService {
 
     List<CarDtoResponse> getAll();
 
-    CarDtoResponse create(CarDtoRequest carDtoRequest) throws InterruptedException;
+    CarDtoResponse create(CarDtoRequest carDtoRequest);
 
     void deleteCar(int carId);
 

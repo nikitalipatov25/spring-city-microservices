@@ -1,10 +1,11 @@
 package com.nikitalipatov.sauron.controller;
 
 import com.nikitalipatov.common.logs.LogsResponse;
-import com.nikitalipatov.common.logs.MyLog;
+import com.nikitalipatov.common.logs.LogDto;
 import com.nikitalipatov.common.logs.EntityLogsResponse;
 import com.nikitalipatov.sauron.service.CityLogService;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
@@ -22,13 +23,14 @@ public class CityLogController {
 
     @MessageMapping("/logs")
     @SendTo("/topic/logs")
-    public void saveLogs(MyLog myLog) {
-       cityLogService.saveLogs(myLog);
+    public void saveLogs(LogDto logDto) {
+       cityLogService.saveLogs(logDto);
     }
 
     @GetMapping("/{from}/{to}")
     @ResponseStatus(value = HttpStatus.ACCEPTED)
-    public List<LogsResponse> getLogsByTime(@PathVariable String from, @PathVariable String to) throws ParseException {
+    @SneakyThrows
+    public List<LogsResponse> getLogsByTime(@PathVariable String from, @PathVariable String to) {
        return cityLogService.getLogsByTime(from, to);
     }
 

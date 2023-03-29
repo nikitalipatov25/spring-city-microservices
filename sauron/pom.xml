@@ -14,6 +14,8 @@
     <description>sauron</description>
     <properties>
         <java.version>17</java.version>
+        <websocket.verson>6.0.7</websocket.verson>
+        <messaging.verson>6.0.7</messaging.verson>
     </properties>
     <dependencies>
         <dependency>
@@ -25,14 +27,14 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-websocket</artifactId>
-            <version>6.0.7</version>
+            <version>${websocket.verson}</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.springframework/spring-messaging -->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-messaging</artifactId>
-            <version>6.0.7</version>
+            <version>${messaging.verson}</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core -->

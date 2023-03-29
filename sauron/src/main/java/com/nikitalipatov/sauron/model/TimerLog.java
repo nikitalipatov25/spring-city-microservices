@@ -15,11 +15,10 @@ import java.util.Date;
 @Builder(toBuilder = true)
 public class TimerLog {
     @Id
-    @SequenceGenerator(name = "timer_seq", allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "timer_seq")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private int id;
     private String logEntity;
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date logTime;
+    private Date logDate;
     private int numOfEntities;
 }

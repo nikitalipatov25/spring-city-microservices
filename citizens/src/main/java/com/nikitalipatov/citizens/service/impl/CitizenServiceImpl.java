@@ -4,6 +4,7 @@ import com.nikitalipatov.citizens.converter.PersonConverter;
 import com.nikitalipatov.citizens.model.Citizen;
 import com.nikitalipatov.citizens.repository.CitizenRepository;
 import com.nikitalipatov.citizens.service.CitizenService;
+import com.nikitalipatov.common.Some;
 import com.nikitalipatov.common.dto.kafka.KafkaMessage;
 import com.nikitalipatov.common.dto.request.PersonDtoRequest;
 import com.nikitalipatov.common.dto.response.PassportDtoResponse;
@@ -13,11 +14,14 @@ import com.nikitalipatov.common.enums.ModelStatus;
 import com.nikitalipatov.common.enums.Status;
 import com.nikitalipatov.common.error.ResourceNotFoundException;
 import com.nikitalipatov.common.feign.PassportClient;
+import com.nikitalipatov.socketstarter.socketClient.WebSocketClientConfig;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
+
 import org.springframework.messaging.simp.stomp.StompSession;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -32,13 +36,14 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @EnableScheduling
+@EnableAsync
 public class CitizenServiceImpl implements CitizenService {
 
     private final KafkaTemplate<String, KafkaMessage> kafkaTemplate;
     private final CitizenRepository personRepository;
     private final PersonConverter citizenConverter;
     private final PassportClient passportClient;
-    private final StompSession stompSession;
+    private final Some some;
 
     private static int numberOfCitizens;
 
@@ -49,7 +54,7 @@ public class CitizenServiceImpl implements CitizenService {
 
     @Scheduled(fixedDelay = 300000)
     public void updateNumOfCars() {
-        stompSession.send("/app/logs", citizenConverter.toLog(numberOfCitizens));
+        //stompSession.send("/app/logs", citizenConverter.toLog(numberOfCitizens));
     }
 
     @Async
@@ -63,7 +68,6 @@ public class CitizenServiceImpl implements CitizenService {
                     .build());
         }
     }
-
 
     @Override
     public void rollback(int citizenId, EventType eventType) {
@@ -118,7 +122,8 @@ public class CitizenServiceImpl implements CitizenService {
                 person.getId()
         );
         kafkaTemplate.send("citizenCommand", message);
-        stompSession.send("/app/logs", citizenConverter.toLog("create", 1));
+        some.sendSome("/app/logs", citizenConverter.toLog("create", 1));
+//        stompSession.send("/app/logs", citizenConverter.toLog("create", 1));
         return citizenConverter.toDto(person);
     }
 
@@ -134,7 +139,7 @@ public class CitizenServiceImpl implements CitizenService {
                 personId
         );
         kafkaTemplate.send("citizenCommand", message);
-        stompSession.send("/app/logs", citizenConverter.toLog("delete", 1));
+        //stompSession.send("/app/logs", citizenConverter.toLog("delete", 1));
         numberOfCitizens = numberOfCitizens - 1;
     }
 

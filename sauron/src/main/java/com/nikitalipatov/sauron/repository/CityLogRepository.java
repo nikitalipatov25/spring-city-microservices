@@ -7,5 +7,5 @@ import java.util.Date;
 import java.util.List;
 
 public interface CityLogRepository extends JpaRepository<Log, Integer> {
-    List<Log> findAllByLogTimeBetween(Date date1, Date date2);
+    List<Log> findAllByLogDateBetween(Date date1, Date date2);
 }

@@ -16,12 +16,11 @@ import java.util.Date;
 public class Log {
 
     @Id
-    @SequenceGenerator(name = "log_seq", allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "log_seq")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private int id;
     private String logEntity;
     private String logType;
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date logTime;
+    private Date logDate;
     private int numOfEntities;
 }

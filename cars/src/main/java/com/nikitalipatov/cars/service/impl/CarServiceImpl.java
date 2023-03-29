@@ -10,10 +10,12 @@ import com.nikitalipatov.common.dto.response.CarDtoResponse;
 import com.nikitalipatov.common.enums.EventType;
 import com.nikitalipatov.common.enums.ModelStatus;
 import com.nikitalipatov.common.enums.Status;
+import com.nikitalipatov.common.error.LotteryException;
 import com.nikitalipatov.common.error.ResourceNotFoundException;
 import com.nikitalipatov.common.feign.CitizenClient;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.messaging.simp.stomp.StompSession;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -25,48 +27,47 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
-@RequiredArgsConstructor
 @EnableScheduling
+@RequiredArgsConstructor
 public class CarServiceImpl implements CarService {
 
+    private static final AtomicBoolean isLottery = new AtomicBoolean(false);
+    private static final AtomicInteger numberOfCars = new AtomicInteger(0);
     private final CarRepository carRepository;
     private final CarConverter carConverter;
     private final KafkaTemplate<String, KafkaMessage> kafkaTemplate;
     private final StompSession stompSession;
     private final CitizenClient citizenClient;
-    private static AtomicBoolean isLottery = new AtomicBoolean(false);
-    private static int numberOfCars;
-
 
     @PostConstruct
     public void init() {
-        numberOfCars = carRepository.countActiveCars();
+        numberOfCars.set(carRepository.countActiveCars());
     }
 
     @Scheduled(fixedDelay = 300000)
     public void updateNumOfCars() {
-        stompSession.send("/app/logs", carConverter.toLog(numberOfCars));
+        stompSession.send("/app/logs", carConverter.toLog(numberOfCars.get()));
     }
 
+    @SneakyThrows
     @Scheduled(fixedDelay = 1000)
-    public void lottery() throws InterruptedException {
-        isLottery.set(true);
-        int numOfCitizens = citizenClient.getNumOfCitizens();
-        var lotteryCar = CarDtoRequest.builder()
-                .ownerId(ThreadLocalRandom.current().nextInt(1, numOfCitizens + 1))
-                .color("Red")
-                .model("BMW")
-                .name("M5")
-                .gosNumber("LOTTERY")
-                .status(ModelStatus.ACTIVE)
-                .build();
-        carRepository.save(carConverter.toEntity(lotteryCar));
-        stompSession.send("/app/logs", carConverter.toLog("create", 1));
-        numberOfCars = numberOfCars + 1;
-        Thread.sleep(60000);
-        isLottery.set(false);
+    public void lottery() {
+        try {
+            int numOfCitizens = citizenClient.getNumOfCitizens();
+            isLottery.set(true);
+            int randomCitizen = ThreadLocalRandom.current().nextInt(1, numOfCitizens + 1);
+            var lotteryCar = CarDtoRequest.builder().ownerId(randomCitizen).build();
+            carRepository.save(carConverter.toEntity(lotteryCar));
+            stompSession.send("/app/logs", carConverter.toLog("create", 1));
+            numberOfCars.getAndIncrement();
+            Thread.sleep(60000);
+            isLottery.set(false);
+        } catch (Exception e) {
+            throw new LotteryException("Лотерея не может быть проведена. Нет участников");
+        }
     }
 
     @Override
@@ -75,15 +76,15 @@ public class CarServiceImpl implements CarService {
     }
 
     @Override
-    public CarDtoResponse create(CarDtoRequest carDtoRequest) throws InterruptedException {
+    @SneakyThrows
+    public CarDtoResponse create(CarDtoRequest carDtoRequest) {
         if (isLottery.get()) {
-            throw new RuntimeException("Идет лотерея. Все продавцы заняты!");
-        } else {
-            var car = carRepository.save(carConverter.toEntity(carDtoRequest));
-            stompSession.send("/app/logs", carConverter.toLog("create", 1));
-            numberOfCars = numberOfCars + 1;
-            return carConverter.toDto(car);
+            throw new LotteryException("Идет лотерея. Все продавцы заняты!");
         }
+        var car = carRepository.save(carConverter.toEntity(carDtoRequest));
+        stompSession.send("/app/logs", carConverter.toLog("create", 1));
+        numberOfCars.getAndIncrement();
+        return carConverter.toDto(car);
     }
 
     public List<CarDtoResponse> getCitizenCar(int personId) {
@@ -97,7 +98,7 @@ public class CarServiceImpl implements CarService {
         personCars.forEach(car -> car.setStatus(ModelStatus.ACTIVE.name()));
         carRepository.saveAll(personCars);
         stompSession.send("/app/logs", carConverter.toLog("create", personCars.size()));
-        numberOfCars = numberOfCars + personCars.size();
+        numberOfCars.getAndAdd(personCars.size());
     }
 
     @Transactional
@@ -114,7 +115,7 @@ public class CarServiceImpl implements CarService {
             );
             kafkaTemplate.send("result", message);
             stompSession.send("/app/logs", carConverter.toLog("delete", personCars.size()));
-            numberOfCars = numberOfCars - personCars.size();
+            numberOfCars.getAndAdd( - personCars.size());
         } catch (Exception e) {
             var message = new KafkaMessage(
                     UUID.randomUUID(),
@@ -130,7 +131,7 @@ public class CarServiceImpl implements CarService {
     public void deleteCar(int carId) {
         carRepository.delete(getCar(carId));
         stompSession.send("/app/logs", carConverter.toLog("delete", 1));
-        numberOfCars = numberOfCars - 1;
+        numberOfCars.getAndDecrement();
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.nikitalipatov.citizens.config.websocket;
 
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
@@ -17,7 +18,8 @@ import java.util.concurrent.ExecutionException;
 public class WebSocketClientConfig {
 
     @Bean
-    public StompSession stompSession() throws InterruptedException, ExecutionException{
+    @SneakyThrows
+    public StompSession stompSession() {
 
         WebSocketClient client = new StandardWebSocketClient();
         WebSocketStompClient stompClient = new WebSocketStompClient(client);
