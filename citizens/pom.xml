@@ -18,12 +18,6 @@
     </properties>
     <dependencies>
 
-        <dependency>
-            <groupId>com.nikitalipatov</groupId>
-            <artifactId>socket-starter</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-        </dependency>
-
         <!-- https://mvnrepository.com/artifact/org.springframework/spring-websocket -->
         <dependency>
             <groupId>org.springframework</groupId>

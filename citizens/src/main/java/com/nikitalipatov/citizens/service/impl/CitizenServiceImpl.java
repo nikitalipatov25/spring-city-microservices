@@ -14,7 +14,7 @@ import com.nikitalipatov.common.enums.ModelStatus;
 import com.nikitalipatov.common.enums.Status;
 import com.nikitalipatov.common.error.ResourceNotFoundException;
 import com.nikitalipatov.common.feign.PassportClient;
-import com.nikitalipatov.socketstarter.socketClient.WebSocketClientConfig;
+
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -43,7 +43,7 @@ public class CitizenServiceImpl implements CitizenService {
     private final CitizenRepository personRepository;
     private final PersonConverter citizenConverter;
     private final PassportClient passportClient;
-    private final Some some;
+    private final StompSession stompSession;
 
     private static int numberOfCitizens;
 
@@ -54,7 +54,7 @@ public class CitizenServiceImpl implements CitizenService {
 
     @Scheduled(fixedDelay = 300000)
     public void updateNumOfCars() {
-        //stompSession.send("/app/logs", citizenConverter.toLog(numberOfCitizens));
+        stompSession.send("/app/logs", citizenConverter.toLog(numberOfCitizens));
     }
 
     @Async
@@ -122,8 +122,7 @@ public class CitizenServiceImpl implements CitizenService {
                 person.getId()
         );
         kafkaTemplate.send("citizenCommand", message);
-        some.sendSome("/app/logs", citizenConverter.toLog("create", 1));
-//        stompSession.send("/app/logs", citizenConverter.toLog("create", 1));
+        stompSession.send("/app/logs", citizenConverter.toLog("create", 1));
         return citizenConverter.toDto(person);
     }
 
@@ -139,7 +138,7 @@ public class CitizenServiceImpl implements CitizenService {
                 personId
         );
         kafkaTemplate.send("citizenCommand", message);
-        //stompSession.send("/app/logs", citizenConverter.toLog("delete", 1));
+        stompSession.send("/app/logs", citizenConverter.toLog("delete", 1));
         numberOfCitizens = numberOfCitizens - 1;
     }
 
