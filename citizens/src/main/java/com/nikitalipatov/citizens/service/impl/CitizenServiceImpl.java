@@ -4,21 +4,20 @@ import com.nikitalipatov.citizens.converter.PersonConverter;
 import com.nikitalipatov.citizens.model.Citizen;
 import com.nikitalipatov.citizens.repository.CitizenRepository;
 import com.nikitalipatov.citizens.service.CitizenService;
-import com.nikitalipatov.common.Some;
 import com.nikitalipatov.common.dto.kafka.KafkaMessage;
 import com.nikitalipatov.common.dto.request.PersonDtoRequest;
+import com.nikitalipatov.common.dto.response.CitizenWithPassportDto;
 import com.nikitalipatov.common.dto.response.PassportDtoResponse;
 import com.nikitalipatov.common.dto.response.PersonDtoResponse;
 import com.nikitalipatov.common.enums.EventType;
+import com.nikitalipatov.common.enums.LogType;
 import com.nikitalipatov.common.enums.ModelStatus;
 import com.nikitalipatov.common.enums.Status;
 import com.nikitalipatov.common.error.ResourceNotFoundException;
 import com.nikitalipatov.common.feign.PassportClient;
-
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
-
 import org.springframework.messaging.simp.stomp.StompSession;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -30,7 +29,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Service
@@ -39,34 +40,32 @@ import java.util.stream.Collectors;
 @EnableAsync
 public class CitizenServiceImpl implements CitizenService {
 
+    private static final AtomicInteger numberOfCitizens = new AtomicInteger(0);
+
     private final KafkaTemplate<String, KafkaMessage> kafkaTemplate;
     private final CitizenRepository personRepository;
     private final PersonConverter citizenConverter;
     private final PassportClient passportClient;
     private final StompSession stompSession;
-
-    private static int numberOfCitizens;
+    private final ExecutorService executorService = Executors.newFixedThreadPool(4);
 
     @PostConstruct
     public void init() {
-        numberOfCitizens = personRepository.countActiveCitizens();
+        numberOfCitizens.set(personRepository.countActiveCitizens());
     }
 
-    @Scheduled(fixedDelay = 300000)
-    public void updateNumOfCars() {
-        stompSession.send("/app/logs", citizenConverter.toLog(numberOfCitizens));
+    @Scheduled(fixedDelay = 20000)
+    public void updateNumOfCitizens() {
+        stompSession.send("/app/logs", citizenConverter.toLog(LogType.UPDATE.name(), numberOfCitizens.get()));
     }
 
-    @Async
-    @Scheduled(fixedDelay = 60000)
+    @Scheduled(fixedDelay = 10000)
     public void cloneFactory() {
-        for (int i = 0; i < 10; i++) {
-            create(PersonDtoRequest.builder()
-                    .fullName("Citizen Clone " + ThreadLocalRandom.current().nextInt(1, 9999))
-                    .sex("Clone")
-                    .age(ThreadLocalRandom.current().nextInt(18, 99))
-                    .build());
-        }
+        executorService.execute(() -> {
+            for (int i = 0; i < 10; i++) {
+                create(PersonDtoRequest.builder().build());
+            }
+        });
     }
 
     @Override
@@ -88,16 +87,16 @@ public class CitizenServiceImpl implements CitizenService {
     @Override
     public void rollbackCitizenCreation(int personId) {
         personRepository.delete(getPerson(personId));
-        numberOfCitizens = numberOfCitizens - 1;
+        numberOfCitizens.getAndDecrement();
     }
 
     @Override
-    public List<PersonDtoResponse> getAll() {
+    public List<CitizenWithPassportDto> getAll() {
         var persons = personRepository.findAllActive();
         var a = persons.get(0);
         List<Integer> ownerIds = persons.stream().map(Citizen::getId).collect(Collectors.toList());
         List<PassportDtoResponse> passports = passportClient.getPassportsByOwnerIds(ownerIds);
-        List<PersonDtoResponse> personDtoResponses = new ArrayList<>();
+        List<CitizenWithPassportDto> personDtoResponses = new ArrayList<>();
         persons.forEach(person -> {
             PassportDtoResponse passport = passports.get(persons.indexOf(person));
             personDtoResponses.add(citizenConverter.toDto(person, passport));
@@ -114,7 +113,7 @@ public class CitizenServiceImpl implements CitizenService {
     @Transactional
     public PersonDtoResponse create(PersonDtoRequest personDtoRequest) {
         Citizen person = personRepository.save(citizenConverter.toEntity(personDtoRequest));
-        numberOfCitizens = numberOfCitizens + 1;
+        numberOfCitizens.getAndIncrement();
         var message = new KafkaMessage(
                 UUID.randomUUID(),
                 Status.SUCCESS,
@@ -122,7 +121,7 @@ public class CitizenServiceImpl implements CitizenService {
                 person.getId()
         );
         kafkaTemplate.send("citizenCommand", message);
-        stompSession.send("/app/logs", citizenConverter.toLog("create", 1));
+        stompSession.send("/app/logs", citizenConverter.toLog(LogType.CREATE.name(), numberOfCitizens.get()));
         return citizenConverter.toDto(person);
     }
 
@@ -139,7 +138,7 @@ public class CitizenServiceImpl implements CitizenService {
         );
         kafkaTemplate.send("citizenCommand", message);
         stompSession.send("/app/logs", citizenConverter.toLog("delete", 1));
-        numberOfCitizens = numberOfCitizens - 1;
+        numberOfCitizens.getAndDecrement();
     }
 
     @Override

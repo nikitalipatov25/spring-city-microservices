@@ -13,8 +13,7 @@ public class CarDtoResponse {
     private String gosNumber;
     private String model;
     private String name;
-    private String type;
     private String color;
-    private double price;
+    private int ownerId;
     private String status;
 }

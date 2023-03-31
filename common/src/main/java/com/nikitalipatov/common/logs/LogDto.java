@@ -3,6 +3,7 @@ package com.nikitalipatov.common.logs;
 import lombok.*;
 
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 @Getter
 @Setter
@@ -11,9 +12,8 @@ import java.text.SimpleDateFormat;
 @Builder
 @ToString
 public class LogDto {
-
     private String logType;
     private String logEntity;
-    private String time;
+    private Date logDate;
     private int numOfEntities;
 }

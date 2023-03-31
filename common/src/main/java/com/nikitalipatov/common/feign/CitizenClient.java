@@ -1,8 +1,8 @@
 package com.nikitalipatov.common.feign;
 
+import com.nikitalipatov.common.dto.response.CitizenWithPassportDto;
 import com.nikitalipatov.common.dto.response.PersonDtoResponse;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,7 +16,7 @@ public interface CitizenClient {
 
     @RequestMapping(method = RequestMethod.GET, value = "/list")
 //    @GetMapping(value = "/list")
-    List<PersonDtoResponse> getAll();
+    List<CitizenWithPassportDto> getAll();
 
     @RequestMapping(method = RequestMethod.GET, value = "/number")
 //    @GetMapping(value = "/number")

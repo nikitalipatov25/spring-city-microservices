@@ -3,10 +3,14 @@ package com.nikitalipatov.houses.converter;
 import com.nikitalipatov.common.dto.response.HouseDtoResponse;
 import com.nikitalipatov.common.dto.request.HouseDtoRequest;
 import com.nikitalipatov.common.dto.response.HousePersonDto;
+import com.nikitalipatov.common.enums.LogEntity;
 import com.nikitalipatov.common.enums.ModelStatus;
 import com.nikitalipatov.common.logs.LogDto;
+import com.nikitalipatov.common.mapper.LogMapper;
+import com.nikitalipatov.houses.mapper.HouseMapper;
 import com.nikitalipatov.houses.model.House;
 import com.nikitalipatov.houses.model.HousePerson;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.text.SimpleDateFormat;
@@ -18,55 +22,29 @@ import java.util.Locale;
 import static com.nikitalipatov.common.constant.Constants.SIMPLE_DATE_FORMAT;
 
 @Component
+@RequiredArgsConstructor
 public class HouseConverter {
 
-    public LogDto toLog(String logType, int numOfEntities) {
-        return LogDto.builder()
-                .logType(logType)
-                .logEntity("house")
-                .numOfEntities(numOfEntities)
-                .time(SIMPLE_DATE_FORMAT.format(new Date()))
-                .build();
-    }
+    private final HouseMapper houseMapper;
 
-    public LogDto toLog(int numOfEntities) {
-        return LogDto.builder()
-                .logType("update")
-                .logEntity("house")
-                .numOfEntities(numOfEntities)
-                .time(SIMPLE_DATE_FORMAT.format(new Date()))
-                .build();
+    public LogDto toLog(String logType, int numOfEntities) {
+        return LogMapper.INSTANCE.toLogDto(logType, LogEntity.HOUSE.name(), new Date(), numOfEntities);
     }
 
     public House toEntity(HouseDtoRequest houseDtoRequest) {
-        return House.builder()
-                .street(houseDtoRequest.getStreet())
-                .number(houseDtoRequest.getNumber())
-                .status(ModelStatus.ACTIVE.name())
-                .build();
+        return houseMapper.toHouse(houseDtoRequest);
     }
 
-
     public House toEntity(House house, HouseDtoRequest houseDtoRequest) {
-        return house.toBuilder()
-                .street(houseDtoRequest.getStreet())
-                .number(houseDtoRequest.getNumber())
-                .status(ModelStatus.ACTIVE.name())
-                .build();
+        return houseMapper.updateModel(houseDtoRequest, house);
     }
 
     public HouseDtoResponse toDto(House house) {
-        return HouseDtoResponse.builder()
-                .street(house.getStreet())
-                .number(house.getNumber())
-                .build();
+        return houseMapper.toHouseDtoResponse(house);
     }
 
     public HousePersonDto toDto(HousePerson housePerson) {
-        return HousePersonDto.builder()
-                .houseId(housePerson.getHousePersonId().getHouseId())
-                .personId(housePerson.getHousePersonId().getOwnerId())
-                .build();
+        return houseMapper.toHousePersonDto(housePerson);
     }
 
     public List<HouseDtoResponse> toDto(List<House> houseList) {

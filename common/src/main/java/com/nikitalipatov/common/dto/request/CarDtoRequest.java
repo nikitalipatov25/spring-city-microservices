@@ -21,5 +21,5 @@ public class CarDtoRequest {
     @Builder.Default
     private String color = "Red";
     @Builder.Default
-    private ModelStatus status = ModelStatus.ACTIVE;
+    private String status = ModelStatus.ACTIVE.name();
 }

@@ -27,8 +27,8 @@ public class CityLogServiceImpl implements CityLogService {
     @Override
     public void saveLogs(LogDto logs) {
         switch (logs.getLogType()) {
-            case "update" -> updateLogs(logs);
-            case "create" ->  createLogs(logs);
+            case "UPDATE" -> updateLogs(logs);
+            case "CREATE" ->  createLogs(logs);
         }
     }
 

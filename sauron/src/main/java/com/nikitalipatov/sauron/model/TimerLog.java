@@ -6,6 +6,8 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 
+import static com.nikitalipatov.common.constant.Constants.DATE_PATTERN;
+
 @Entity
 @Table(name ="timer_log")
 @AllArgsConstructor
@@ -18,7 +20,7 @@ public class TimerLog {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private int id;
     private String logEntity;
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern = DATE_PATTERN)
     private Date logDate;
     private int numOfEntities;
 }

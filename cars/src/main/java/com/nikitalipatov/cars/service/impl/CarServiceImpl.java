@@ -8,6 +8,7 @@ import com.nikitalipatov.common.dto.kafka.KafkaMessage;
 import com.nikitalipatov.common.dto.request.CarDtoRequest;
 import com.nikitalipatov.common.dto.response.CarDtoResponse;
 import com.nikitalipatov.common.enums.EventType;
+import com.nikitalipatov.common.enums.LogType;
 import com.nikitalipatov.common.enums.ModelStatus;
 import com.nikitalipatov.common.enums.Status;
 import com.nikitalipatov.common.error.LotteryException;
@@ -47,13 +48,14 @@ public class CarServiceImpl implements CarService {
         numberOfCars.set(carRepository.countActiveCars());
     }
 
-    @Scheduled(fixedDelay = 300000)
+    @Scheduled(fixedDelay = 20000)
     public void updateNumOfCars() {
-        stompSession.send("/app/logs", carConverter.toLog(numberOfCars.get()));
+        stompSession.send("/app/logs", carConverter.toLog(LogType.UPDATE.name(), numberOfCars.get()));
     }
 
     @SneakyThrows
-    @Scheduled(fixedDelay = 1000)
+    @Scheduled(fixedDelay = 60000)
+    @Transactional
     public void lottery() {
         try {
             int numOfCitizens = citizenClient.getNumOfCitizens();
@@ -61,12 +63,14 @@ public class CarServiceImpl implements CarService {
             int randomCitizen = ThreadLocalRandom.current().nextInt(1, numOfCitizens + 1);
             var lotteryCar = CarDtoRequest.builder().ownerId(randomCitizen).build();
             carRepository.save(carConverter.toEntity(lotteryCar));
-            stompSession.send("/app/logs", carConverter.toLog("create", 1));
             numberOfCars.getAndIncrement();
-            Thread.sleep(60000);
+            stompSession.send("/app/logs", carConverter.toLog(LogType.CREATE.name(), numberOfCars.get()));
+            Thread.sleep(30000);
             isLottery.set(false);
         } catch (Exception e) {
-            throw new LotteryException("Лотерея не может быть проведена. Нет участников");
+            throw new LotteryException("Лотерея не может быть проведена");
+        } finally {
+            isLottery.set(false);
         }
     }
 
@@ -77,13 +81,14 @@ public class CarServiceImpl implements CarService {
 
     @Override
     @SneakyThrows
+    @Transactional
     public CarDtoResponse create(CarDtoRequest carDtoRequest) {
         if (isLottery.get()) {
             throw new LotteryException("Идет лотерея. Все продавцы заняты!");
         }
         var car = carRepository.save(carConverter.toEntity(carDtoRequest));
-        stompSession.send("/app/logs", carConverter.toLog("create", 1));
         numberOfCars.getAndIncrement();
+        stompSession.send("/app/logs", carConverter.toLog(LogType.CREATE.name(), numberOfCars.get()));
         return carConverter.toDto(car);
     }
 
@@ -97,8 +102,8 @@ public class CarServiceImpl implements CarService {
         var personCars = carRepository.findAllByOwnerId(personId);
         personCars.forEach(car -> car.setStatus(ModelStatus.ACTIVE.name()));
         carRepository.saveAll(personCars);
-        stompSession.send("/app/logs", carConverter.toLog("create", personCars.size()));
         numberOfCars.getAndAdd(personCars.size());
+        stompSession.send("/app/logs", carConverter.toLog(LogType.CREATE.name(), numberOfCars.get()));
     }
 
     @Transactional
@@ -114,8 +119,8 @@ public class CarServiceImpl implements CarService {
                     personId
             );
             kafkaTemplate.send("result", message);
-            stompSession.send("/app/logs", carConverter.toLog("delete", personCars.size()));
             numberOfCars.getAndAdd( - personCars.size());
+            stompSession.send("/app/logs", carConverter.toLog(LogType.DELETE.name(), numberOfCars.get()));
         } catch (Exception e) {
             var message = new KafkaMessage(
                     UUID.randomUUID(),
@@ -130,8 +135,8 @@ public class CarServiceImpl implements CarService {
     @Override
     public void deleteCar(int carId) {
         carRepository.delete(getCar(carId));
-        stompSession.send("/app/logs", carConverter.toLog("delete", 1));
         numberOfCars.getAndDecrement();
+        stompSession.send("/app/logs", carConverter.toLog(LogType.DELETE.name(), numberOfCars.get()));
     }
 
     @Override

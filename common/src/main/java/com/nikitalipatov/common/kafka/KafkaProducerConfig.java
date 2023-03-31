@@ -1,9 +1,9 @@
-package com.nikitalipatov.houses.config;
+package com.nikitalipatov.common.kafka;
 
-import com.nikitalipatov.common.dto.kafka.CitizenEvent;
 import com.nikitalipatov.common.dto.kafka.KafkaMessage;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
@@ -17,6 +17,9 @@ import java.util.Map;
 @Configuration
 public class KafkaProducerConfig {
 
+    @Value("${kafka.server.config}")
+    private String serverConfig;
+
     @Bean
     public KafkaTemplate<String, KafkaMessage> kafkaTemplate() {
         return new KafkaTemplate<>(producerFactory());
@@ -24,7 +27,7 @@ public class KafkaProducerConfig {
 
     private ProducerFactory<String, KafkaMessage> producerFactory() {
         Map<String, Object> configProps = new HashMap<>();
-        configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:29092");
+        configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, serverConfig);
         configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
         return new DefaultKafkaProducerFactory<>(configProps);

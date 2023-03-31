@@ -11,9 +11,6 @@ import java.util.List;
 @NoArgsConstructor
 public class HouseDtoResponse {
 
-    private String city;
     private String street;
     private String number;
-    private int houseId;
-    private List<Integer> citizenIds;
 }

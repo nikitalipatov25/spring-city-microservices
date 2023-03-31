@@ -3,6 +3,7 @@ package com.nikitalipatov.passports.service.impl;
 import com.nikitalipatov.common.dto.kafka.KafkaMessage;
 import com.nikitalipatov.common.dto.response.PassportDtoResponse;
 import com.nikitalipatov.common.enums.EventType;
+import com.nikitalipatov.common.enums.LogType;
 import com.nikitalipatov.common.enums.Status;
 import com.nikitalipatov.common.enums.ModelStatus;
 import com.nikitalipatov.common.error.ResourceNotFoundException;
@@ -22,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 @RequiredArgsConstructor
@@ -33,16 +35,16 @@ public class PassportServiceImpl implements PassportService {
     private final KafkaTemplate<String, KafkaMessage> kafkaTemplate;
     private final StompSession stompSession;
 
-    private static int numOfPassports;
+    private static final AtomicInteger numberOfPassports = new AtomicInteger(0);
 
     @PostConstruct
     public void init() {
-        numOfPassports = passportRepository.countActivePassports();
+        numberOfPassports.set(passportRepository.countActivePassports());
     }
 
-    @Scheduled(fixedDelay = 300000)
-    public void updateNumOfCars() {
-        stompSession.send("/app/logs", passportConverter.toLog(numOfPassports));
+    @Scheduled(fixedDelay = 20000)
+    public void updateNumOfPassport() {
+        stompSession.send("/app/logs", passportConverter.toLog(LogType.UPDATE.name(), numberOfPassports.get()));
     }
 
     @Override
@@ -50,8 +52,8 @@ public class PassportServiceImpl implements PassportService {
         Passport passport = getPassport(ownerId);
         passport.setStatus(ModelStatus.ACTIVE.name());
         passportRepository.save(passport);
-        stompSession.send("/app/logs", passportConverter.toLog("create", 1));
-        numOfPassports = numOfPassports + 1;
+        numberOfPassports.getAndIncrement();
+        stompSession.send("/app/logs", passportConverter.toLog(LogType.CREATE.name(), numberOfPassports.get()));
     }
 
     @Override
@@ -66,8 +68,8 @@ public class PassportServiceImpl implements PassportService {
                     personId
             );
             kafkaTemplate.send("result", message);
-            stompSession.send("/app/logs", passportConverter.toLog("create", 1));
-            numOfPassports = numOfPassports + 1;
+            numberOfPassports.getAndIncrement();
+            stompSession.send("/app/logs", passportConverter.toLog(LogType.CREATE.name(), numberOfPassports.get()));
         } catch (Exception e) {
             passportRepository.save(passport);
             var message = new KafkaMessage(
@@ -104,8 +106,8 @@ public class PassportServiceImpl implements PassportService {
                     personId
             );
             kafkaTemplate.send("result", message);
-            stompSession.send("/app/logs", passportConverter.toLog("create", 1));
-            numOfPassports = numOfPassports - 1;
+            numberOfPassports.getAndDecrement();
+            stompSession.send("/app/logs", passportConverter.toLog(LogType.DELETE.name(), numberOfPassports.get()));
         } catch (Exception e) {
             var message = new KafkaMessage(
                     UUID.randomUUID(),

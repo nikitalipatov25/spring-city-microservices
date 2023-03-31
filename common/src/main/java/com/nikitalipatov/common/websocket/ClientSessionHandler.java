@@ -1,4 +1,4 @@
-package com.nikitalipatov.common;
+package com.nikitalipatov.common.websocket;
 
 import com.nikitalipatov.common.logs.LogDto;
 import org.springframework.context.annotation.Configuration;

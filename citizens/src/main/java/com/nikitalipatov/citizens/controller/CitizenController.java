@@ -2,11 +2,11 @@ package com.nikitalipatov.citizens.controller;
 
 import com.nikitalipatov.citizens.service.CitizenService;
 import com.nikitalipatov.common.dto.request.PersonDtoRequest;
+import com.nikitalipatov.common.dto.response.CitizenWithPassportDto;
 import com.nikitalipatov.common.dto.response.PersonDtoResponse;
 import com.nikitalipatov.common.feign.CitizenClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,7 +31,7 @@ public class CitizenController implements CitizenClient {
 //    @PreAuthorize("hasRole('write')")
     @GetMapping(value = "/list")
     @ResponseStatus(value = HttpStatus.ACCEPTED)
-    public List<PersonDtoResponse> getAll() {
+    public List<CitizenWithPassportDto> getAll() {
         return personService.getAll();
     }
 
