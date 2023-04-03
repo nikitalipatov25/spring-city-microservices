@@ -1,6 +1,7 @@
 package com.nikitalipatov.common.dto.request;
 
 import com.nikitalipatov.common.enums.ModelStatus;
+import com.nikitalipatov.common.enums.WorkPlace;
 import lombok.*;
 
 import java.util.concurrent.ThreadLocalRandom;
@@ -20,4 +21,6 @@ public class PersonDtoRequest {
     private String sex = "Clone";
     @Builder.Default
     private String status = ModelStatus.ACTIVE.name();
+    @Builder.Default
+    private String work = WorkPlace.FACTORY.name();
 }

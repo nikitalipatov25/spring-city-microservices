@@ -11,4 +11,5 @@ public class PersonDtoResponse {
     private String name;
     private int age;
     private String sex;
+    private String work;
 }

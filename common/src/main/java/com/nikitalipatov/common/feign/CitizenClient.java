@@ -1,5 +1,6 @@
 package com.nikitalipatov.common.feign;
 
+import com.nikitalipatov.common.dto.response.ActiveCitizen;
 import com.nikitalipatov.common.dto.response.CitizenWithPassportDto;
 import com.nikitalipatov.common.dto.response.PersonDtoResponse;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -10,15 +11,15 @@ import java.util.List;
 @FeignClient(value = "CitizenClient", url = "http://localhost:8082/api/person")
 public interface CitizenClient {
 
-    @RequestMapping(method = RequestMethod.GET, value = "/rollback/{personId}")
-//    @GetMapping(value = "/rollback/{personId}")
+    @GetMapping(value = "/rollback/{personId}")
     void rollbackCitizenCreation(@PathVariable int personId);
 
-    @RequestMapping(method = RequestMethod.GET, value = "/list")
-//    @GetMapping(value = "/list")
+    @GetMapping(value = "/list")
     List<CitizenWithPassportDto> getAll();
 
-    @RequestMapping(method = RequestMethod.GET, value = "/number")
-//    @GetMapping(value = "/number")
+    @GetMapping(value = "/number")
     int getNumOfCitizens();
+
+    @GetMapping(value = "/active")
+    List<ActiveCitizen> getActiveCitizens();
 }

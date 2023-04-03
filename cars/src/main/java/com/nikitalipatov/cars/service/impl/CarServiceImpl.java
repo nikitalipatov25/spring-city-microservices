@@ -17,6 +17,8 @@ import com.nikitalipatov.common.feign.CitizenClient;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.messaging.simp.stomp.StompSession;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -35,6 +37,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 @RequiredArgsConstructor
 public class CarServiceImpl implements CarService {
 
+
+
     private static final AtomicBoolean isLottery = new AtomicBoolean(false);
     private static final AtomicInteger numberOfCars = new AtomicInteger(0);
     private final CarRepository carRepository;
@@ -42,6 +46,9 @@ public class CarServiceImpl implements CarService {
     private final KafkaTemplate<String, KafkaMessage> kafkaTemplate;
     private final StompSession stompSession;
     private final CitizenClient citizenClient;
+    @Lazy
+    @Autowired
+    private CarServiceImpl carService;
 
     @PostConstruct
     public void init() {
@@ -54,17 +61,16 @@ public class CarServiceImpl implements CarService {
     }
 
     @SneakyThrows
-    @Scheduled(fixedDelay = 60000)
+    @Scheduled(fixedDelay = 10000)
     public void startLottery() {
         isLottery.set(true);
-        int numOfCitizens = citizenClient.getNumOfCitizens();
-        int randomCitizen = ThreadLocalRandom.current().nextInt(1, numOfCitizens + 1);
+        int numOfCitizens = 99;
+        int randomCitizen = carService.chooseWinner();
         var lotteryCar = Car.builder().ownerId(randomCitizen).build();
         try {
             carRepository.save(lotteryCar);
             stompSession.send("/app/logs", carConverter.toLog(LogType.CREATE.name(), numberOfCars.get() + 1));
             numberOfCars.getAndIncrement();
-            Thread.sleep(30000);
             isLottery.set(false);
         } catch (Exception e) {
             deleteLotteryCar(lotteryCar.getId());
@@ -72,6 +78,11 @@ public class CarServiceImpl implements CarService {
         } finally {
             isLottery.set(false);
         }
+    }
+
+    public int chooseWinner() {
+        int result = 1;
+        return result;
     }
 
     @Override

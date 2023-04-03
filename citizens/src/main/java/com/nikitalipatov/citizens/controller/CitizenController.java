@@ -2,6 +2,7 @@ package com.nikitalipatov.citizens.controller;
 
 import com.nikitalipatov.citizens.service.CitizenService;
 import com.nikitalipatov.common.dto.request.PersonDtoRequest;
+import com.nikitalipatov.common.dto.response.ActiveCitizen;
 import com.nikitalipatov.common.dto.response.CitizenWithPassportDto;
 import com.nikitalipatov.common.dto.response.PersonDtoResponse;
 import com.nikitalipatov.common.feign.CitizenClient;
@@ -58,5 +59,11 @@ public class CitizenController implements CitizenClient {
     @ResponseStatus(value = HttpStatus.ACCEPTED)
     public void delete(@PathVariable int id) {
         personService.delete(id);
+    }
+
+    @GetMapping(value = "/active")
+    @ResponseStatus(value = HttpStatus.ACCEPTED)
+    public List<ActiveCitizen> getActiveCitizens() {
+        return personService.getActiveCitizens();
     }
 }

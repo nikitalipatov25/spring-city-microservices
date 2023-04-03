@@ -2,6 +2,7 @@ package com.nikitalipatov.citizens.service;
 
 import com.nikitalipatov.citizens.model.Citizen;
 import com.nikitalipatov.common.dto.request.PersonDtoRequest;
+import com.nikitalipatov.common.dto.response.ActiveCitizen;
 import com.nikitalipatov.common.dto.response.CitizenWithPassportDto;
 import com.nikitalipatov.common.dto.response.PersonDtoResponse;
 import com.nikitalipatov.common.enums.EventType;
@@ -27,5 +28,7 @@ public interface CitizenService {
     void rollback(int citizenId, EventType eventType);
 
     int getNumOfActiveCitizens();
+
+    List<ActiveCitizen> getActiveCitizens();
 
 }

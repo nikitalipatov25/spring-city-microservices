@@ -1,6 +1,7 @@
 package com.nikitalipatov.citizens.model;
 
 import com.nikitalipatov.common.enums.ModelStatus;
+import com.nikitalipatov.common.enums.WorkPlace;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -24,4 +25,7 @@ public class Citizen {
     private String sex;
 
     private String status;
+
+    @Builder.Default
+    private String work = WorkPlace.FACTORY.name();
 }

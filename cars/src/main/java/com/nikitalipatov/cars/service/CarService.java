@@ -23,4 +23,6 @@ public interface CarService {
     List<CarDtoResponse> getCitizenCar(int personId);
 
     void deletePersonCars(int personId);
+
+    int chooseWinner();
 }

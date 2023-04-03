@@ -6,6 +6,7 @@ import com.nikitalipatov.citizens.repository.CitizenRepository;
 import com.nikitalipatov.citizens.service.CitizenService;
 import com.nikitalipatov.common.dto.kafka.KafkaMessage;
 import com.nikitalipatov.common.dto.request.PersonDtoRequest;
+import com.nikitalipatov.common.dto.response.ActiveCitizen;
 import com.nikitalipatov.common.dto.response.CitizenWithPassportDto;
 import com.nikitalipatov.common.dto.response.PassportDtoResponse;
 import com.nikitalipatov.common.dto.response.PersonDtoResponse;
@@ -59,14 +60,14 @@ public class CitizenServiceImpl implements CitizenService {
         stompSession.send("/app/logs", citizenConverter.toLog(LogType.UPDATE.name(), numberOfCitizens.get()));
     }
 
-    @Scheduled(fixedDelay = 10000)
-    public void cloneFactory() {
-        executorService.execute(() -> {
-            for (int i = 0; i < 10; i++) {
-                create(PersonDtoRequest.builder().build());
-            }
-        });
-    }
+//    @Scheduled(fixedDelay = 10000)
+//    public void cloneFactory() {
+//        executorService.execute(() -> {
+//            for (int i = 0; i < 10; i++) {
+//                create(PersonDtoRequest.builder().build());
+//            }
+//        });
+//    }
 
     @Override
     public void rollback(int citizenId, EventType eventType) {
@@ -157,6 +158,10 @@ public class CitizenServiceImpl implements CitizenService {
     @Override
     public int getNumOfActiveCitizens() {
         return personRepository.countActiveCitizens();
+    }
+
+    public List<ActiveCitizen> getActiveCitizens() {
+        return citizenConverter.toDtoActive(personRepository.findAllActive());
     }
 
 }
