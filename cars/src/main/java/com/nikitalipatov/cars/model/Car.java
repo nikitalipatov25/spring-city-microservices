@@ -17,17 +17,16 @@ public class Car {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private int id;
-
-    private String gosNumber;
-
-    private String model;
-
-    private String name;
-
-    private String color;
-
+    @Builder.Default
+    private String gosNumber = "LOTTERY";
+    @Builder.Default
+    private String model = "BMW";
+    @Builder.Default
+    private String name = "M5";
+    @Builder.Default
+    private String color = "Red";
     private int ownerId;
-
-    private String status;
+    @Builder.Default
+    private String status = ModelStatus.ACTIVE.name();
 
 }

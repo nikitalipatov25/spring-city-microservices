@@ -55,19 +55,19 @@ public class CarServiceImpl implements CarService {
 
     @SneakyThrows
     @Scheduled(fixedDelay = 60000)
-    @Transactional
-    public void lottery() {
+    public void startLottery() {
+        isLottery.set(true);
+        int numOfCitizens = citizenClient.getNumOfCitizens();
+        int randomCitizen = ThreadLocalRandom.current().nextInt(1, numOfCitizens + 1);
+        var lotteryCar = Car.builder().ownerId(randomCitizen).build();
         try {
-            int numOfCitizens = citizenClient.getNumOfCitizens();
-            isLottery.set(true);
-            int randomCitizen = ThreadLocalRandom.current().nextInt(1, numOfCitizens + 1);
-            var lotteryCar = CarDtoRequest.builder().ownerId(randomCitizen).build();
-            carRepository.save(carConverter.toEntity(lotteryCar));
+            carRepository.save(lotteryCar);
+            stompSession.send("/app/logs", carConverter.toLog(LogType.CREATE.name(), numberOfCars.get() + 1));
             numberOfCars.getAndIncrement();
-            stompSession.send("/app/logs", carConverter.toLog(LogType.CREATE.name(), numberOfCars.get()));
             Thread.sleep(30000);
             isLottery.set(false);
         } catch (Exception e) {
+            deleteLotteryCar(lotteryCar.getId());
             throw new LotteryException("Лотерея не может быть проведена");
         } finally {
             isLottery.set(false);
@@ -87,8 +87,8 @@ public class CarServiceImpl implements CarService {
             throw new LotteryException("Идет лотерея. Все продавцы заняты!");
         }
         var car = carRepository.save(carConverter.toEntity(carDtoRequest));
+        stompSession.send("/app/logs", carConverter.toLog(LogType.CREATE.name(), numberOfCars.get() + 1));
         numberOfCars.getAndIncrement();
-        stompSession.send("/app/logs", carConverter.toLog(LogType.CREATE.name(), numberOfCars.get()));
         return carConverter.toDto(car);
     }
 
@@ -150,5 +150,10 @@ public class CarServiceImpl implements CarService {
         return carRepository.findById(carId).orElseThrow(
                 () -> new ResourceNotFoundException("No such car with id " + carId)
         );
+    }
+
+    private void deleteLotteryCar(int carId) {
+        var car = getCar(carId);
+        carRepository.delete(car);
     }
 }

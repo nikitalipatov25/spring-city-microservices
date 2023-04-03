@@ -11,6 +11,7 @@ import java.util.concurrent.ThreadLocalRandom;
 @AllArgsConstructor
 public class CarDtoRequest {
 
+    private int id;
     private int ownerId;
     @Builder.Default
     private String gosNumber = "LOTTERY";
