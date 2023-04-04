@@ -13,9 +13,9 @@ import com.nikitalipatov.common.mapper.LogMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -48,9 +48,7 @@ public class PersonConverter {
     }
 
     public List<ActiveCitizen> toDtoActive(List<Citizen> citizens) {
-        List<ActiveCitizen> activeCitizenList = new ArrayList<>();
-        citizens.forEach(this::toDtoActive);
-        return activeCitizenList;
+        return citizens.stream().map(this::toDtoActive).collect(Collectors.toList());
     }
 
 }

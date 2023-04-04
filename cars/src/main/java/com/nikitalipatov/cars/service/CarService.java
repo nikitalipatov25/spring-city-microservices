@@ -1,8 +1,8 @@
 package com.nikitalipatov.cars.service;
 
 import com.nikitalipatov.cars.model.Car;
-import com.nikitalipatov.common.dto.response.CarDtoResponse;
 import com.nikitalipatov.common.dto.request.CarDtoRequest;
+import com.nikitalipatov.common.dto.response.CarDtoResponse;
 
 import java.util.List;
 
@@ -23,6 +23,4 @@ public interface CarService {
     List<CarDtoResponse> getCitizenCar(int personId);
 
     void deletePersonCars(int personId);
-
-    int chooseWinner();
 }

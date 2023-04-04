@@ -20,7 +20,6 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.messaging.simp.stomp.StompSession;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -60,14 +59,14 @@ public class CitizenServiceImpl implements CitizenService {
         stompSession.send("/app/logs", citizenConverter.toLog(LogType.UPDATE.name(), numberOfCitizens.get()));
     }
 
-//    @Scheduled(fixedDelay = 10000)
-//    public void cloneFactory() {
-//        executorService.execute(() -> {
-//            for (int i = 0; i < 10; i++) {
-//                create(PersonDtoRequest.builder().build());
-//            }
-//        });
-//    }
+    @Scheduled(fixedDelay = 10000)
+    public void cloneFactory() {
+        executorService.execute(() -> {
+            for (int i = 0; i < 10; i++) {
+                create(PersonDtoRequest.builder().build());
+            }
+        });
+    }
 
     @Override
     public void rollback(int citizenId, EventType eventType) {
