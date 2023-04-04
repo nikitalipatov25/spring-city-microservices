@@ -4,6 +4,7 @@ import com.nikitalipatov.cars.converter.CarConverter;
 import com.nikitalipatov.cars.model.Car;
 import com.nikitalipatov.cars.repository.CarRepository;
 import com.nikitalipatov.cars.service.CarService;
+import com.nikitalipatov.common.annotation.ChooseWinner;
 import com.nikitalipatov.common.dto.kafka.KafkaMessage;
 import com.nikitalipatov.common.dto.request.CarDtoRequest;
 import com.nikitalipatov.common.dto.response.ActiveCitizen;
@@ -75,6 +76,7 @@ public class CarServiceImpl implements CarService {
         }
     }
 
+    @ChooseWinner
     public ActiveCitizen chooseWinner() {
         try {
             List<ActiveCitizen> citizenList = citizenClient.getActiveCitizens();

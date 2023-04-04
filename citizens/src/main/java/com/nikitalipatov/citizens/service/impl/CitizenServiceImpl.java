@@ -59,14 +59,14 @@ public class CitizenServiceImpl implements CitizenService {
         stompSession.send("/app/logs", citizenConverter.toLog(LogType.UPDATE.name(), numberOfCitizens.get()));
     }
 
-    @Scheduled(fixedDelay = 10000)
-    public void cloneFactory() {
-        executorService.execute(() -> {
-            for (int i = 0; i < 10; i++) {
-                create(PersonDtoRequest.builder().build());
-            }
-        });
-    }
+//    @Scheduled(fixedDelay = 10000)
+//    public void cloneFactory() {
+//        executorService.execute(() -> {
+//            for (int i = 0; i < 10; i++) {
+//                create(PersonDtoRequest.builder().build());
+//            }
+//        });
+//    }
 
     @Override
     public void rollback(int citizenId, EventType eventType) {

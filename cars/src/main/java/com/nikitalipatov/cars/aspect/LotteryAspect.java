@@ -21,7 +21,7 @@ public class LotteryAspect {
 
     private final CitizenClient citizenClient;
 
-    @Pointcut("execution(public com.nikitalipatov.common.dto.response.ActiveCitizen com.nikitalipatov.cars.service.impl.CarServiceImpl.chooseWinner())")
+    @Pointcut("@annotation(com.nikitalipatov.common.annotation.ChooseWinner)")
     public void callAtLotteryChooseWinner() {}
 
     @Around(value = "callAtLotteryChooseWinner()")
