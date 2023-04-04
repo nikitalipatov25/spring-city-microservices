@@ -9,7 +9,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Import;
 
-@Import({WebSocketClientConfig.class, KafkaConsumerConfig.class, KafkaProducerConfig.class})
+@Import({KafkaConsumerConfig.class, KafkaProducerConfig.class})
 @SpringBootApplication
 @EnableFeignClients(clients = {CitizenClient.class})
 public class CarsApplication {

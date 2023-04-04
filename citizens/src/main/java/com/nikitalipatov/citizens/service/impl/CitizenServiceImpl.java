@@ -16,6 +16,7 @@ import com.nikitalipatov.common.enums.ModelStatus;
 import com.nikitalipatov.common.enums.Status;
 import com.nikitalipatov.common.error.ResourceNotFoundException;
 import com.nikitalipatov.common.feign.PassportClient;
+import com.nikitalipatov.socketclientstarter.service.SenderService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -46,8 +47,8 @@ public class CitizenServiceImpl implements CitizenService {
     private final CitizenRepository personRepository;
     private final PersonConverter citizenConverter;
     private final PassportClient passportClient;
-    private final StompSession stompSession;
     private final ExecutorService executorService = Executors.newFixedThreadPool(4);
+    private final SenderService senderService;
 
     @PostConstruct
     public void init() {
@@ -56,17 +57,17 @@ public class CitizenServiceImpl implements CitizenService {
 
     @Scheduled(fixedDelay = 20000)
     public void updateNumOfCitizens() {
-        stompSession.send("/app/logs", citizenConverter.toLog(LogType.UPDATE.name(), numberOfCitizens.get()));
+        senderService.send("/app/logs", citizenConverter.toLog(LogType.UPDATE.name(), numberOfCitizens.get()));
     }
 
-//    @Scheduled(fixedDelay = 10000)
-//    public void cloneFactory() {
-//        executorService.execute(() -> {
-//            for (int i = 0; i < 10; i++) {
-//                create(PersonDtoRequest.builder().build());
-//            }
-//        });
-//    }
+    @Scheduled(fixedDelay = 30000)
+    public void cloneFactory() {
+        executorService.execute(() -> {
+            for (int i = 0; i < 10; i++) {
+                create(PersonDtoRequest.builder().build());
+            }
+        });
+    }
 
     @Override
     public void rollback(int citizenId, EventType eventType) {
@@ -121,7 +122,7 @@ public class CitizenServiceImpl implements CitizenService {
                 person.getId()
         );
         kafkaTemplate.send("citizenCommand", message);
-        stompSession.send("/app/logs", citizenConverter.toLog(LogType.CREATE.name(), numberOfCitizens.get()));
+        senderService.send("/app/logs", citizenConverter.toLog(LogType.CREATE.name(), numberOfCitizens.get()));
         return citizenConverter.toDto(person);
     }
 
@@ -137,7 +138,7 @@ public class CitizenServiceImpl implements CitizenService {
                 personId
         );
         kafkaTemplate.send("citizenCommand", message);
-        stompSession.send("/app/logs", citizenConverter.toLog("delete", 1));
+        senderService.send("/app/logs", citizenConverter.toLog(LogType.DELETE.name(), numberOfCitizens.get()));
         numberOfCitizens.getAndDecrement();
     }
 

@@ -4,4 +4,5 @@ public enum LogType {
     UPDATE,
     CREATE,
     DELETE,
+    START_LOTTERY
 }

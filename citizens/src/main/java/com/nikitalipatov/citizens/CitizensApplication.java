@@ -12,7 +12,7 @@ import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfi
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Import;
 
-@Import({WebSocketClientConfig.class, KafkaConsumerConfig.class, KafkaProducerConfig.class})
+@Import({ KafkaConsumerConfig.class, KafkaProducerConfig.class})
 @SpringBootApplication(exclude = { SecurityAutoConfiguration.class })
 @EnableFeignClients(clients = {PassportClient.class, HouseClient.class, CarClient.class})
 public class CitizensApplication {

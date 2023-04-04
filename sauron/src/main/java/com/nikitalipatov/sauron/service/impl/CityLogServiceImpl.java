@@ -28,7 +28,7 @@ public class CityLogServiceImpl implements CityLogService {
     public void saveLogs(LogDto logs) {
         switch (logs.getLogType()) {
             case "UPDATE" -> updateLogs(logs);
-            case "CREATE" ->  createLogs(logs);
+            case "CREATE", "START_LOTTERY", "DELETE" ->  createLogs(logs);
         }
     }
 

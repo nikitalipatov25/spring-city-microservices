@@ -16,6 +16,7 @@ import com.nikitalipatov.houses.model.HousePerson;
 import com.nikitalipatov.houses.repository.HousePersonRepository;
 import com.nikitalipatov.houses.repository.HouseRepository;
 import com.nikitalipatov.houses.service.HouseService;
+import com.nikitalipatov.socketclientstarter.service.SenderService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -39,7 +40,7 @@ public class HouseServiceImpl implements HouseService {
     private final HouseConverter houseConverter;
     private final HousePersonRepository housePersonRepository;
     private final KafkaTemplate<String, KafkaMessage> kafkaTemplate;
-    private final StompSession stompSession;
+    private final SenderService senderService;
 
     @PostConstruct
     public void init() {
@@ -48,14 +49,14 @@ public class HouseServiceImpl implements HouseService {
 
     @Scheduled(fixedDelay = 20000)
     public void updateNumOfHouses() {
-        stompSession.send("/app/logs", houseConverter.toLog(LogType.UPDATE.name(), numberOfHouses.get()));
+        senderService.send("/app/logs", houseConverter.toLog(LogType.UPDATE.name(), numberOfHouses.get()));
     }
 
     public void rollbackDeletedCitizenFromHouses(int personId) {
         var personHouses = housePersonRepository.getCitizenHouses(personId);
         personHouses.forEach(house -> house.setStatus(ModelStatus.ACTIVE.name()));
         housePersonRepository.saveAll(personHouses);
-        stompSession.send("/app/logs", houseConverter.toLog(LogType.CREATE.name(), numberOfHouses.get()));
+        senderService.send("/app/logs", houseConverter.toLog(LogType.CREATE.name(), numberOfHouses.get()));
     }
 
     @Override
@@ -67,7 +68,7 @@ public class HouseServiceImpl implements HouseService {
     public HouseDtoResponse create(HouseDtoRequest houseDtoRequest) {
         var house = houseConverter.toDto(houseRepository.save(houseConverter.toEntity(houseDtoRequest)));
         numberOfHouses.getAndIncrement();
-        stompSession.send("/app/logs", houseConverter.toLog(LogType.CREATE.name(), numberOfHouses.get()));
+        senderService.send("/app/logs", houseConverter.toLog(LogType.CREATE.name(), numberOfHouses.get()));
         return house;
     }
 
@@ -107,7 +108,7 @@ public class HouseServiceImpl implements HouseService {
     public void delete(int houseId) {
         houseRepository.delete(getHouse(houseId));
         numberOfHouses.getAndDecrement();
-        stompSession.send("/app/logs", houseConverter.toLog(LogType.DELETE.name(), numberOfHouses.get()));
+        senderService.send("/app/logs", houseConverter.toLog(LogType.DELETE.name(), numberOfHouses.get()));
     }
 
     @Override
