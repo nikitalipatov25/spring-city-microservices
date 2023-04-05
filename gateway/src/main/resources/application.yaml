@@ -2,22 +2,32 @@ server:
   port: 8080
 
 spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          gateway-client-oidc:
+            provider: spring
+            client-id: gateway-client
+            client-secret: secret
+            authorization-grant-type: authorization_code
+            redirect-uri: "http://127.0.0.1:8080/login/oauth2/code/{registrationId}"
+            client-name: gateway-client-oidc
+            scope: write, read
+        provider:
+          spring:
+            issuer-uri: http://localhost:9000
+
   cloud:
     gateway:
       routes:
-        - id: citizenModule
-          uri: http://localhost:8082/
+        - id: citizens
+          uri: http://127.0.0.1:8082
           predicates:
             - Path=/api/person/**
-        - id: passportModule
-          uri: http://localhost:8084/
+          filters:
+            - TokenRelay=
+        - id: passports
+          uri: http://127.0.0.1:8084
           predicates:
             - Path=/api/passport/**
-        - id: carModule
-          uri: http://localhost:8081/
-          predicates:
-            - Path=/api/car**
-        - id: houseModule
-          uri: http://localhost:8083/
-          predicates:
-            - Path=/api/house/**

@@ -3,9 +3,6 @@ package com.nikitalipatov.cars.model;
 import com.nikitalipatov.common.enums.ModelStatus;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.BatchSize;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 
 @Entity
 @Table(name = "car")
@@ -14,24 +11,22 @@ import org.hibernate.annotations.FetchMode;
 @Getter
 @Setter
 @Builder(toBuilder = true)
+@ToString
 public class Car {
 
     @Id
-    @SequenceGenerator(name = "car_seq", allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "car_seq")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private int id;
-
-    private String gosNumber;
-
-    private String model;
-
-    private String name;
-
-    private String color;
-
-    private double price;
-
+    @Builder.Default
+    private String gosNumber = "LOTTERY";
+    @Builder.Default
+    private String model = "BMW";
+    @Builder.Default
+    private String name = "M5";
+    @Builder.Default
+    private String color = "Red";
     private int ownerId;
+    @Builder.Default
+    private String status = ModelStatus.ACTIVE.name();
 
-    private ModelStatus status;
 }

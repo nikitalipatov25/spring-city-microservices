@@ -1,6 +1,7 @@
 package com.nikitalipatov.citizens.model;
 
 import com.nikitalipatov.common.enums.ModelStatus;
+import com.nikitalipatov.common.enums.WorkPlace;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -14,8 +15,7 @@ import lombok.*;
 public class Citizen {
 
     @Id
-    @SequenceGenerator(name = "person_seq", allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "person_seq")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private int id;
 
     private String fullName;
@@ -24,5 +24,8 @@ public class Citizen {
 
     private String sex;
 
-    private ModelStatus status;
+    private String status;
+
+    @Builder.Default
+    private String work = WorkPlace.FACTORY.name();
 }

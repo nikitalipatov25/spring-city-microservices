@@ -17,8 +17,8 @@ public class CarController implements CarClient {
     private final CarService carService;
 
     @Override
-    public CarDtoResponse createCars(@PathVariable int userId, @RequestBody CarDtoRequest carDtoRequest) {
-        return carService.create(userId, carDtoRequest);
+    public CarDtoResponse createCars(@RequestBody CarDtoRequest carDtoRequest)  {
+        return carService.create(carDtoRequest);
     }
 
     @Override

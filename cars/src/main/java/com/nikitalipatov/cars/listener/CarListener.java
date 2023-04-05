@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-@KafkaListener(topics = "citizenCommand", groupId = "test-gi", containerFactory = "kafkaCarListenerContainerFactory")
+@KafkaListener(topics = "citizenCommand", groupId = "test-gi", containerFactory = "kafkaListenerContainerFactory")
 public class CarListener {
 
     private final CarService carService;

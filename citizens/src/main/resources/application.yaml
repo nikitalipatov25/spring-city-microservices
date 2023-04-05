@@ -1,4 +1,10 @@
 spring:
+#  security:
+#    oauth2:
+#      resourceserver:
+#        jwt:
+#          issuer-uri: http://127.0.0.1:9000
+#          jwk-set-uri: http://127.0.0.1:9000/oauth2/jwks
   application:
     name: citizen-micro
   datasource:
@@ -15,4 +21,6 @@ spring:
     generate-ddl: true
 server:
   port: 8082
+#websocket: ws://localhost:8090/websocket-server
+#  value: ws://localhost:8090/websocket-server
 
