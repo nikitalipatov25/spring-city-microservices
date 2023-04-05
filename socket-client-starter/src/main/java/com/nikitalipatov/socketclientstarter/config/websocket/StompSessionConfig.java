@@ -1,10 +1,8 @@
 package com.nikitalipatov.socketclientstarter.config.websocket;
 
-import com.nikitalipatov.common.websocket.ClientSessionHandler;
 import com.nikitalipatov.socketclientstarter.config.StarterProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
@@ -26,7 +24,7 @@ public class StompSessionConfig {
         WebSocketClient client = new StandardWebSocketClient();
         WebSocketStompClient stompClient = new WebSocketStompClient(client);
         stompClient.setMessageConverter(new MappingJackson2MessageConverter());
-        com.nikitalipatov.common.websocket.ClientSessionHandler clientSessionHandler = new ClientSessionHandler();
+        ClientSessionHandler clientSessionHandler = new ClientSessionHandler();
         ListenableFuture<StompSession> sessionAsync =
                 stompClient.connect(starterProperties.getUrl(), clientSessionHandler);
         StompSession session = sessionAsync.get();

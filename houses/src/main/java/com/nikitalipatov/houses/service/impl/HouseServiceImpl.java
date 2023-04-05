@@ -16,6 +16,7 @@ import com.nikitalipatov.houses.model.HousePerson;
 import com.nikitalipatov.houses.repository.HousePersonRepository;
 import com.nikitalipatov.houses.repository.HouseRepository;
 import com.nikitalipatov.houses.service.HouseService;
+import com.nikitalipatov.socketclientstarter.config.annotation.EnableSauronWs;
 import com.nikitalipatov.socketclientstarter.service.SenderService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +34,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Service
 @RequiredArgsConstructor
 @EnableScheduling
+@EnableSauronWs(criteria = true)
 public class HouseServiceImpl implements HouseService {
 
     private static final AtomicInteger numberOfHouses = new AtomicInteger(0);

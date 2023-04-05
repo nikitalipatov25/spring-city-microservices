@@ -13,6 +13,7 @@ import com.nikitalipatov.common.enums.*;
 import com.nikitalipatov.common.error.LotteryException;
 import com.nikitalipatov.common.error.ResourceNotFoundException;
 import com.nikitalipatov.common.feign.CitizenClient;
+import com.nikitalipatov.socketclientstarter.config.annotation.EnableSauronWs;
 import com.nikitalipatov.socketclientstarter.service.SenderService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +36,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Service
 @EnableScheduling
 @RequiredArgsConstructor
+@EnableSauronWs(criteria = true)
 public class CarServiceImpl implements CarService {
 
     private static final AtomicBoolean isLottery = new AtomicBoolean(false);

@@ -11,6 +11,7 @@ import com.nikitalipatov.passports.converter.PassportConverter;
 import com.nikitalipatov.passports.model.Passport;
 import com.nikitalipatov.passports.repository.PassportRepository;
 import com.nikitalipatov.passports.service.PassportService;
+import com.nikitalipatov.socketclientstarter.config.annotation.EnableSauronWs;
 import com.nikitalipatov.socketclientstarter.service.SenderService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Service
 @RequiredArgsConstructor
 @EnableScheduling
+@EnableSauronWs(criteria = true)
 public class PassportServiceImpl implements PassportService {
 
     private final PassportRepository passportRepository;

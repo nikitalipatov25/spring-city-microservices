@@ -16,6 +16,7 @@ import com.nikitalipatov.common.enums.ModelStatus;
 import com.nikitalipatov.common.enums.Status;
 import com.nikitalipatov.common.error.ResourceNotFoundException;
 import com.nikitalipatov.common.feign.PassportClient;
+import com.nikitalipatov.socketclientstarter.config.annotation.EnableSauronWs;
 import com.nikitalipatov.socketclientstarter.service.SenderService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +40,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @EnableScheduling
 @EnableAsync
+@EnableSauronWs(criteria = true)
 public class CitizenServiceImpl implements CitizenService {
 
     private static final AtomicInteger numberOfCitizens = new AtomicInteger(0);
